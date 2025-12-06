@@ -653,9 +653,11 @@ function RouteComponent() {
 							variant="secondary"
 							className="w-full justify-start"
 							onClick={() => void declineSso()}
-							disabled={sessionAction !== null || !hasSsoConnections}
+							disabled={
+								sessionAction !== null || !accountData?.accounts?.length
+							}
 							title={
-								hasSsoConnections
+								accountData?.accounts?.length
 									? "Disconnect SSO providers and sign out"
 									: "No SSO connections detected"
 							}
