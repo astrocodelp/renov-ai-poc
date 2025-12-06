@@ -846,6 +846,8 @@ After using all relevant tools, provide a comprehensive analysis summary.`;
 			// STEP 2: Create a detailed image generation prompt based on the analysis
 			const imagePromptCreationRequest = `Based on the following floor plan geometry analysis and room context, create a detailed prompt for generating a photorealistic interior design rendering.
 
+CRITICAL CONSTRAINT: The generated image MUST maintain the EXACT SAME camera angle, perspective, and viewpoint as the reference room photo. The camera position cannot change - only describe what elements in the room should be modified.
+
 GEOMETRY ANALYSIS:
 ${geometryAnalysis.text}
 
@@ -855,20 +857,20 @@ ${JSON.stringify(toolResults, null, 2)}
 ROOM CONTEXT:
 ${contextParts.join("\n")}
 
-Create a detailed, vivid prompt for an AI image generator that will produce a photorealistic interior design rendering. The prompt should:
-1. Describe the exact room dimensions and layout from the analysis
-2. Specify furniture placement based on the calculated recommendations
-3. Define the color palette using the calculated colors
-4. Describe lighting based on the lighting analysis
+Create a detailed, vivid prompt describing ONLY the changes to apply to the room while keeping the exact same camera view. The prompt should:
+1. NEVER mention changing the camera angle, position, or perspective - assume the exact same viewpoint
+2. Describe what furniture to add/change based on the calculated recommendations
+3. Define the color palette using the calculated colors for walls, floors, and furnishings
+4. Describe lighting fixtures and their effects (but keep natural light direction unchanged)
 5. Incorporate the "${style}" design style with specific materials and textures
 6. Address the user's specific request: "${prompt}"
-7. Include camera angle, perspective, and mood descriptors
+7. Describe specific furniture pieces, materials, and decorative elements to place in the scene
 8. Mention specific brands or designer references if appropriate for the style
 
-Write the prompt as a single, detailed paragraph optimized for image generation. Start directly with the description.`;
+IMPORTANT: Do NOT describe the camera or viewing angle. Write the prompt as if you're describing renovations to a room photo that will keep its original perspective. Start directly with the room transformation description.`;
 
 			const promptCreation = await generateText({
-				model: openrouter("google/gemini-2.5-pro-preview"),
+				model: openrouter("google/gemini-3-pro-preview"),
 				messages: [
 					{
 						role: "user",
@@ -890,11 +892,24 @@ Write the prompt as a single, detailed paragraph optimized for image generation.
 			// OpenRouter doesn't expose this, so we use their direct chat completions API
 			// with modalities: ["text", "image"] to get image output
 
-			const finalImagePrompt = `Photorealistic interior design rendering, professional architectural photography, 4K quality, realistic lighting and textures, high detail:
+			const finalImagePrompt = `CRITICAL INSTRUCTION: You MUST preserve the EXACT same camera angle, perspective, viewpoint, and composition as the reference image provided. Do NOT change the camera position, field of view, or framing in any way. The output image must look like it was taken from the IDENTICAL position and angle as the input photo.
 
+WHAT TO KEEP UNCHANGED:
+- Camera angle and position (do not move the camera)
+- Perspective and field of view
+- Room structure, walls, windows, doors positions
+- Overall composition and framing
+- Lighting direction and shadows placement
+
+WHAT TO CHANGE (based on user request):
 ${detailedImagePrompt}
 
-Create a photorealistic image as if taken by a professional architectural photographer. The image should be suitable for a renovation visualization presentation.`;
+OUTPUT REQUIREMENTS:
+- Photorealistic interior design rendering
+- Professional architectural photography quality, 4K detail
+- Realistic lighting and textures
+- The viewer should feel they are looking at the SAME room from the SAME position, just renovated
+- Suitable for a before/after renovation comparison presentation`;
 
 			console.log(
 				"Using OpenRouter API with google/gemini-3-pro-image-preview...",
@@ -943,55 +958,65 @@ Create a photorealistic image as if taken by a professional architectural photog
 			);
 
 			if (geminiImageResponse.ok) {
+				// OpenRouter image generation response format:
+				// https://openrouter.ai/docs/guides/overview/multimodal/image-generation
+				// Images are in message.images array, not in content
 				const geminiData = (await geminiImageResponse.json()) as {
 					choices?: Array<{
 						message?: {
-							content?:
-								| string
-								| Array<{
-										type: string;
-										image_url?: { url: string };
-										text?: string;
-								  }>;
+							role?: string;
+							content?: string;
+							// Images are returned in a separate 'images' array per OpenRouter docs
+							images?: Array<{
+								type: string;
+								image_url: { url: string };
+							}>;
 						};
 					}>;
 				};
 
 				console.log(
 					"Gemini response received:",
-					JSON.stringify(geminiData, null, 2).slice(0, 500),
+					JSON.stringify(geminiData, null, 2),
 				);
 
-				// Extract image from Gemini response
-				const content = geminiData.choices?.[0]?.message?.content;
+				// Extract image from OpenRouter response format
+				// Per docs: images are in message.images[].image_url.url as base64 data URLs
+				const message = geminiData.choices?.[0]?.message;
 				let geminiImageBuffer: Buffer | null = null;
 
-				if (typeof content === "string") {
-					// Check for base64 image in string content
-					const base64Match = content.match(
-						/data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/,
-					);
-					if (base64Match) {
-						geminiImageBuffer = Buffer.from(base64Match[1], "base64");
-					}
-				} else if (Array.isArray(content)) {
-					// Look for image in multimodal response array
-					for (const part of content) {
-						if (part.type === "image_url" && part.image_url?.url) {
-							const url = part.image_url.url;
-							if (url.startsWith("data:")) {
-								const base64Data = url.split(",")[1];
-								if (base64Data) {
-									geminiImageBuffer = Buffer.from(base64Data, "base64");
-									break;
-								}
-							} else {
-								// Fetch from external URL
-								const urlImgResponse = await fetch(url);
-								const arrayBuffer = await urlImgResponse.arrayBuffer();
-								geminiImageBuffer = Buffer.from(arrayBuffer);
-								break;
+				// Check for images in the dedicated 'images' array (OpenRouter format)
+				if (message?.images && message.images.length > 0) {
+					const imageData = message.images[0];
+					if (imageData?.image_url?.url) {
+						const url = imageData.image_url.url;
+						console.log("Found image in message.images array");
+
+						if (url.startsWith("data:")) {
+							// Extract base64 data from data URL
+							const base64Data = url.split(",")[1];
+							if (base64Data) {
+								geminiImageBuffer = Buffer.from(base64Data, "base64");
 							}
+						} else {
+							// Fetch from external URL if not a data URL
+							const urlImgResponse = await fetch(url);
+							const arrayBuffer = await urlImgResponse.arrayBuffer();
+							geminiImageBuffer = Buffer.from(arrayBuffer);
+						}
+					}
+				}
+
+				// Fallback: Check content for inline base64 image (older format)
+				if (!geminiImageBuffer && message?.content) {
+					const content = message.content;
+					if (typeof content === "string") {
+						const base64Match = content.match(
+							/data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/,
+						);
+						if (base64Match) {
+							console.log("Found image in content string (fallback)");
+							geminiImageBuffer = Buffer.from(base64Match[1], "base64");
 						}
 					}
 				}

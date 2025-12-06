@@ -595,8 +595,10 @@ function ProjectDetailPage() {
 														</div>
 														<img
 															src={generatedImageUrl}
+															width={1024}
+															height={720}
 															alt={`${room.name} renovation visualization`}
-															className="h-auto w-full rounded-lg border border-emerald-200 object-contain shadow-md dark:border-emerald-800"
+															className="h-auto max-w-[1024px] rounded-lg border border-emerald-200 object-contain shadow-md dark:border-emerald-800"
 														/>
 														<div className="flex gap-2">
 															<a
