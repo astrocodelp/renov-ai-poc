@@ -1,6 +1,5 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useStore } from "@nanostores/react";
 import { Github, Loader2, ArrowLeft } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client";
@@ -12,7 +11,7 @@ export const Route = createFileRoute("/signup")({
 });
 
 function SignupRouteComponent() {
-	const session = useStore(authClient.useSession);
+	const { data: session } = authClient.useSession();
 	const navigate = useNavigate();
 
 	const [form, setForm] = useState({
@@ -27,10 +26,10 @@ function SignupRouteComponent() {
 	const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (session.data?.user) {
+		if (session?.user) {
 			navigate({ to: "/dashboard" });
 		}
-	}, [navigate, session.data?.user]);
+	}, [navigate, session?.user]);
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -71,17 +70,27 @@ function SignupRouteComponent() {
 		setError(null);
 		setLoadingProvider(provider);
 		try {
-			await authClient.signIn.social({
+			const result = await authClient.signIn.social({
 				provider,
 				callbackURL: "/dashboard",
 				errorCallbackURL: "/signup",
 			});
+
+			const url =
+				(result as { url?: string } | undefined)?.url ??
+				(result as { data?: { url?: string } } | undefined)?.data?.url;
+
+			if (url) {
+				window.location.href = url;
+				return;
+			}
 		} catch (err) {
 			const message =
 				err instanceof Error
 					? err.message
 					: "Unable to start the social sign-in flow.";
 			setError(message);
+		} finally {
 			setLoadingProvider(null);
 		}
 	};
@@ -123,7 +132,7 @@ function SignupRouteComponent() {
 								onChange={(e) =>
 									setForm((prev) => ({ ...prev, firstName: e.target.value }))
 								}
-								disabled={loading || session.isPending}
+								disabled={loading}
 							/>
 						</div>
 						<div className="flex flex-col gap-2">
@@ -137,7 +146,7 @@ function SignupRouteComponent() {
 								onChange={(e) =>
 									setForm((prev) => ({ ...prev, lastName: e.target.value }))
 								}
-								disabled={loading || session.isPending}
+								disabled={loading}
 							/>
 						</div>
 
@@ -153,7 +162,7 @@ function SignupRouteComponent() {
 								onChange={(e) =>
 									setForm((prev) => ({ ...prev, email: e.target.value }))
 								}
-								disabled={loading || session.isPending}
+								disabled={loading}
 								required
 							/>
 						</div>
@@ -170,7 +179,7 @@ function SignupRouteComponent() {
 								onChange={(e) =>
 									setForm((prev) => ({ ...prev, password: e.target.value }))
 								}
-								disabled={loading || session.isPending}
+								disabled={loading}
 								required
 							/>
 						</div>
@@ -189,14 +198,14 @@ function SignupRouteComponent() {
 										confirmPassword: e.target.value,
 									}))
 								}
-								disabled={loading || session.isPending}
+								disabled={loading}
 								required
 							/>
 						</div>
 
 						<button
 							type="submit"
-							disabled={loading || session.isPending}
+							disabled={loading}
 							className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
 						>
 							{loading ? (
@@ -214,13 +223,10 @@ function SignupRouteComponent() {
 						<div className="flex flex-col space-y-3">
 							<button
 								type="button"
-								onClick={() => handleSocialLogin("github")}
-								disabled={
-									session.isPending ||
-									Boolean(session.data) ||
-									Boolean(loadingProvider) ||
-									loading
-								}
+								onClick={() => {
+									console.log("GitHub signup clicked");
+									handleSocialLogin("github");
+								}}
 								className="inline-flex items-center justify-center gap-3 rounded-xl border border-border bg-card hover:bg-muted px-4 py-3 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary/60 disabled:opacity-60 disabled:cursor-not-allowed"
 							>
 								{loadingProvider === "github" ? (

@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 
 import { useState } from "react";
-import { useStore } from "@nanostores/react";
 import {
 	ChevronDown,
 	ChevronRight,
@@ -23,7 +22,7 @@ export default function Header() {
 	const [groupedExpanded, setGroupedExpanded] = useState<
 		Record<string, boolean>
 	>({});
-	const session = useStore(authClient.useSession);
+	const { data: session } = authClient.useSession();
 	const navigate = useNavigate();
 
 	const handleLogout = async () => {
@@ -55,17 +54,16 @@ export default function Header() {
 				</div>
 
 				<div className="ml-auto flex items-center gap-3">
-					{session.data ? (
+					{session ? (
 						<>
 							<div className="hidden sm:flex flex-col text-sm text-gray-300">
 								<span className="font-semibold text-white">
-									{session.data.user.name ??
-										session.data.user.email ??
-										"Signed in"}
+									{session.user.name ?? session.user.email ?? "Signed in"}
 								</span>
 								<span className="text-xs text-gray-400">Authenticated</span>
 							</div>
 							<button
+								type="button"
 								onClick={handleLogout}
 								className="flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold hover:bg-red-700 transition-colors"
 							>
@@ -93,6 +91,7 @@ export default function Header() {
 				<div className="flex items-center justify-between p-4 border-b border-gray-700">
 					<h2 className="text-xl font-bold">Navigation</h2>
 					<button
+						type="button"
 						onClick={() => setIsOpen(false)}
 						className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
 						aria-label="Close menu"
@@ -157,6 +156,7 @@ export default function Header() {
 							<span className="font-medium">Start - SSR Demos</span>
 						</Link>
 						<button
+							type="button"
 							className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
 							onClick={() =>
 								setGroupedExpanded((prev) => ({

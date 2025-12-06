@@ -1,6 +1,5 @@
-import { useEffect, useEffectEvent, useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useStore } from "@nanostores/react";
 import {
 	AlertTriangle,
 	CheckCircle2,
@@ -54,7 +53,11 @@ export const Route = createFileRoute("/dashboard/settings/auth")({
 
 function RouteComponent() {
 	const navigate = useNavigate();
-	const session = useStore(authClient.useSession);
+	const {
+		data: session,
+		isPending,
+		refetch: refetchSession,
+	} = authClient.useSession();
 
 	const [profileName, setProfileName] = useState("");
 	const [accountData, setAccountData] = useState<AccountSummary | null>(null);
@@ -67,20 +70,17 @@ function RouteComponent() {
 	const [currentPassword, setCurrentPassword] = useState("");
 	const [newPassword, setNewPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
+	const [deleteConfirmation, setDeleteConfirmation] = useState("");
+	const [deletingAccount, setDeletingAccount] = useState(false);
 
 	type SessionShape = {
 		session?: { id?: string | null } | null;
 		sessionId?: string | null;
 	};
 
-	const currentSession = session.data as SessionShape | null;
+	const currentSession = session as SessionShape | null;
 	const currentSessionId =
 		currentSession?.session?.id ?? currentSession?.sessionId ?? null;
-
-	const hasSsoConnections = useMemo(
-		() => (accountData?.accounts.length ?? 0) > 0,
-		[accountData?.accounts.length],
-	);
 
 	const hasProvider = (data: AccountSummary | null, provider: string) =>
 		(data?.accounts ?? []).some((a) => a.providerId === provider);
@@ -109,10 +109,22 @@ function RouteComponent() {
 	type SessionSignal = { get?: () => boolean; set?: (value: boolean) => void };
 
 	const refreshAuthSession = async () => {
+		// Prefer the official Better Auth refetch first so all subscribers update
+		if (typeof refetchSession === "function") {
+			await refetchSession();
+		}
+
 		const sessionAtom = (authClient as { session?: SessionAtom }).session;
 		const refetch = sessionAtom?.get?.()?.refetch;
 		if (typeof refetch === "function") {
 			await refetch();
+			return;
+		}
+
+		const useSessionAtom = authClient.useSession as unknown as SessionAtom;
+		const refetchUseSession = useSessionAtom?.get?.()?.refetch;
+		if (typeof refetchUseSession === "function") {
+			await refetchUseSession();
 			return;
 		}
 
@@ -128,20 +140,21 @@ function RouteComponent() {
 	) => {
 		const sessionAtom = (authClient as { session?: SessionAtom }).session;
 		const current: SessionStore = sessionAtom?.get?.() ?? null;
-		if (!current || !sessionAtom?.set) return;
 
-		sessionAtom.set({
-			...current,
-			data: current.data
-				? {
-						...current.data,
-						user: {
-							...current.data.user,
-							...nextUser,
-						},
-					}
-				: current.data,
-		});
+		if (current && sessionAtom?.set) {
+			sessionAtom.set({
+				...current,
+				data: current.data
+					? {
+							...current.data,
+							user: {
+								...current.data.user,
+								...nextUser,
+							},
+						}
+					: current.data,
+			});
+		}
 	};
 
 	const loadAccountData = useEffectEvent(async () => {
@@ -170,9 +183,9 @@ function RouteComponent() {
 	});
 
 	useEffect(() => {
-		if (session.isPending) return;
+		if (isPending) return;
 		void loadAccountData();
-	}, [session.isPending]);
+	}, [isPending]);
 
 	const handleProfileSave = async () => {
 		if (!profileName.trim()) {
@@ -396,6 +409,44 @@ function RouteComponent() {
 		}
 	};
 
+	const handleDeleteAccount = async () => {
+		const confirmation = deleteConfirmation.trim().toLowerCase();
+
+		if (confirmation !== "confirm") {
+			setError('Type "confirm" to delete your account');
+			return;
+		}
+
+		setDeletingAccount(true);
+		setError(null);
+		setSuccess(null);
+
+		try {
+			const res = await fetch("/api/settings/account", {
+				method: "POST",
+				headers: { "content-type": "application/json" },
+				credentials: "include",
+				body: JSON.stringify({
+					action: "delete-account",
+					confirmation: deleteConfirmation,
+				}),
+			});
+
+			const body = (await res.json().catch(() => ({}))) as { error?: string };
+			if (!res.ok) {
+				throw new Error(body.error ?? "Unable to delete account");
+			}
+
+			await refreshAuthSession();
+			await authClient.signOut();
+			await navigate({ to: "/login", replace: true, reloadDocument: true });
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Unable to delete account");
+		} finally {
+			setDeletingAccount(false);
+		}
+	};
+
 	const renderSessions = () => {
 		if (!accountData?.sessions?.length) {
 			return (
@@ -461,6 +512,9 @@ function RouteComponent() {
 			</div>
 		);
 	};
+
+	const deleteConfirmationMatches =
+		deleteConfirmation.trim().toLowerCase() === "confirm";
 
 	if (loading) {
 		return (
@@ -778,6 +832,53 @@ function RouteComponent() {
 				</div>
 
 				{renderSessions()}
+			</div>
+
+			<div className="space-y-3 rounded-xl border border-destructive/40 bg-destructive/5 p-6 shadow-sm">
+				<div className="flex items-start justify-between">
+					<div>
+						<h2 className="text-lg font-semibold text-destructive">
+							Danger zone
+						</h2>
+						<p className="text-sm text-destructive/80">
+							Delete your account and all projects and rooms associated with it.
+							This action is immediate and cannot be undone.
+						</p>
+					</div>
+					<AlertTriangle className="h-5 w-5 text-destructive" />
+				</div>
+
+				<div className="grid gap-3 md:grid-cols-[1.5fr,auto] md:items-end">
+					<div className="space-y-2">
+						<Label htmlFor="deleteConfirmation" className="text-destructive">
+							Type confirm to continue
+						</Label>
+						<Input
+							id="deleteConfirmation"
+							value={deleteConfirmation}
+							onChange={(e) => setDeleteConfirmation(e.target.value)}
+							placeholder='Type "confirm"'
+							className="border-destructive/50 focus-visible:ring-destructive"
+						/>
+						<p className="text-xs text-destructive/80">
+							All projects and rooms are removed via cascading deletes. Linked
+							files will no longer be accessible.
+						</p>
+					</div>
+					<Button
+						variant="destructive"
+						className="w-full md:w-auto"
+						disabled={!deleteConfirmationMatches || deletingAccount}
+						onClick={() => void handleDeleteAccount()}
+					>
+						{deletingAccount ? (
+							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+						) : (
+							<AlertTriangle className="mr-2 h-4 w-4" />
+						)}
+						Delete account
+					</Button>
+				</div>
 			</div>
 		</div>
 	);

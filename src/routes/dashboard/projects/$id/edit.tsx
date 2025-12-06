@@ -1,29 +1,23 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	getRouteApi,
+	Link,
+	useNavigate,
+} from "@tanstack/react-router";
 import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { FileUpload } from "@/components/ui/file-upload";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { FileUpload } from "@/components/ui/file-upload";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-export const Route = createFileRoute("/dashboard/projects/new")({
-	component: NewProject,
-});
-
-type RoomType =
-	| "LIVING_ROOM"
-	| "KITCHEN"
-	| "BATHROOM"
-	| "BEDROOM"
-	| "DINING_ROOM"
-	| "OFFICE"
-	| "OTHER";
+import type { ProjectDetail, ProjectRoom, RoomType } from "./route";
 
 type RoomForm = {
 	id: string;
@@ -33,6 +27,11 @@ type RoomForm = {
 	image?: File;
 	floorPlan?: File;
 	useProjectPlan: boolean;
+	isExisting: boolean;
+	hasExistingImage: boolean;
+	hasExistingFloorPlan: boolean;
+	imageDataUrl?: string | null;
+	floorPlanDataUrl?: string | null;
 };
 
 const ROOM_TYPES: RoomType[] = [
@@ -67,31 +66,87 @@ const isPdfOrImageFile = (file: File | undefined) => {
 	);
 };
 
+const isLikelyImageUrl = (url?: string | null) => {
+	if (!url) return false;
+	const lower = url.toLowerCase();
+	return (
+		lower.startsWith("data:image") ||
+		/\.(png|jpe?g|gif|webp|bmp|svg)(\?|$)/.test(lower)
+	);
+};
+
 function newRoom(): RoomForm {
 	return {
-		id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36),
+		id: Math.random().toString(36),
 		name: "",
 		type: "LIVING_ROOM",
 		description: "",
 		floorPlan: undefined,
 		useProjectPlan: true,
+		isExisting: false,
+		hasExistingImage: false,
+		hasExistingFloorPlan: false,
+		imageDataUrl: null,
+		floorPlanDataUrl: null,
 	};
 }
 
-function NewProject() {
+// Get access to the parent route's loader data
+const parentRoute = getRouteApi("/dashboard/projects/$id");
+
+export const Route = createFileRoute("/dashboard/projects/$id/edit")({
+	component: EditProjectPage,
+});
+
+function EditProjectPage() {
+	// Use the parent route's loader data
+	const project = parentRoute.useLoaderData() as ProjectDetail;
 	const navigate = useNavigate();
-	const initialRoom = newRoom();
-	const [projectName, setProjectName] = useState("");
-	const [projectDescription, setProjectDescription] = useState("");
+
+	const [projectDefaultFloorPlanUrl] = useState<string | null>(
+		project.defaultFloorPlanDataUrl,
+	);
+	const [projectDefaultFloorPlanName] = useState<string | null>(
+		project.defaultFloorPlanFileName ?? null,
+	);
+	const [initialHasProjectDefaultFloorPlan] = useState(
+		Boolean(project.defaultFloorPlanDataUrl),
+	);
+
+	const initialRooms = project.rooms.map((room: ProjectRoom) => ({
+		id: room.id,
+		name: room.name,
+		type: room.type as RoomType,
+		description: room.description ?? "",
+		image: undefined,
+		floorPlan: undefined,
+		useProjectPlan:
+			!room.floorPlanDataUrl && Boolean(project.defaultFloorPlanDataUrl),
+		isExisting: true,
+		hasExistingImage: Boolean(room.imageDataUrl),
+		hasExistingFloorPlan: Boolean(room.floorPlanDataUrl),
+		imageDataUrl: room.imageDataUrl,
+		floorPlanDataUrl: room.floorPlanDataUrl,
+	}));
+
+	const [projectName, setProjectName] = useState(project.name);
+	const [projectDescription, setProjectDescription] = useState(
+		project.description ?? "",
+	);
 	const [projectFloorPlan, setProjectFloorPlan] = useState<File | undefined>();
-	const [rooms, setRooms] = useState<RoomForm[]>([initialRoom]);
-	const [openRooms, setOpenRooms] = useState<string[]>([initialRoom.id]);
+	const [rooms, setRooms] = useState<RoomForm[]>(initialRooms);
+	const [openRooms, setOpenRooms] = useState<string[]>(
+		initialRooms.map((room) => room.id),
+	);
+	const [deletedRoomIds, setDeletedRoomIds] = useState<string[]>([]);
 	const [errors, setErrors] = useState<string[]>([]);
+	const [submitError, setSubmitError] = useState<string | null>(null);
 	const [submittedProjectId, setSubmittedProjectId] = useState<string | null>(
 		null,
 	);
-	const [submitError, setSubmitError] = useState<string | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [deleteError, setDeleteError] = useState<string | null>(null);
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	const handleRoomUpdate = (roomId: string, update: Partial<RoomForm>) => {
 		setRooms((prev) =>
@@ -100,18 +155,25 @@ function NewProject() {
 	};
 
 	const handleAddRoom = () => {
+		const hasProjectDefault =
+			Boolean(projectFloorPlan) || Boolean(projectDefaultFloorPlanUrl);
 		const room = {
 			...newRoom(),
 			floorPlan: projectFloorPlan,
-			// Keep rooms opted into project plan even if the plan is added later.
-			useProjectPlan: Boolean(projectFloorPlan) || true,
+			useProjectPlan: hasProjectDefault,
 		};
 		setRooms((prev) => [...prev, room]);
 		setOpenRooms((prev) => [...prev, room.id]);
 	};
 
 	const handleRemoveRoom = (roomId: string) => {
-		setRooms((prev) => prev.filter((room) => room.id !== roomId));
+		setRooms((prev) => {
+			const room = prev.find((r) => r.id === roomId);
+			if (room?.isExisting) {
+				setDeletedRoomIds((ids) => [...ids, roomId]);
+			}
+			return prev.filter((r) => r.id !== roomId);
+		});
 	};
 
 	const confirmRemoveRoom = (roomId: string) => {
@@ -135,6 +197,9 @@ function NewProject() {
 		} else if (projectFloorPlan && projectFloorPlan.size > MAX_FILE_BYTES) {
 			nextErrors.push("Project floor plan must be at most 10MB.");
 		}
+		const hasProjectDefault =
+			Boolean(projectFloorPlan) || Boolean(projectDefaultFloorPlanUrl);
+
 		rooms.forEach((room, idx) => {
 			if (!room.name.trim()) {
 				nextErrors.push(`Room ${idx + 1}: name is required.`);
@@ -150,8 +215,19 @@ function NewProject() {
 				nextErrors.push(`Room ${idx + 1}: type is required.`);
 			}
 			const selectedFloorPlan =
-				room.floorPlan ?? (room.useProjectPlan ? projectFloorPlan : undefined);
-			if (!selectedFloorPlan) {
+				room.floorPlan ??
+				(room.useProjectPlan ? projectFloorPlan : undefined) ??
+				(room.useProjectPlan && hasProjectDefault
+					? ("PROJECT_DEFAULT" as unknown as File)
+					: undefined);
+			const hasExistingPlan =
+				room.hasExistingFloorPlan &&
+				!room.floorPlan &&
+				!(
+					room.useProjectPlan &&
+					(projectFloorPlan || projectDefaultFloorPlanUrl)
+				);
+			if (!selectedFloorPlan && !hasExistingPlan) {
 				nextErrors.push(
 					`Room ${idx + 1}: floor plan is required (project or per-room).`,
 				);
@@ -179,11 +255,12 @@ function NewProject() {
 
 		const formData = new FormData();
 		formData.set("name", projectName.trim());
+		formData.set("description", projectDescription.trim());
 		if (projectFloorPlan) {
 			formData.set("projectFloorPlan", projectFloorPlan);
 		}
-		if (projectDescription.trim()) {
-			formData.set("description", projectDescription.trim());
+		if (!projectFloorPlan && initialHasProjectDefaultFloorPlan) {
+			formData.set("projectFloorPlanRemoved", "true");
 		}
 
 		formData.set(
@@ -199,6 +276,8 @@ function NewProject() {
 			),
 		);
 
+		formData.set("deletedRoomIds", JSON.stringify(deletedRoomIds));
+
 		for (const room of rooms) {
 			if (room.image) {
 				formData.set(`roomImage-${room.id}`, room.image);
@@ -212,16 +291,17 @@ function NewProject() {
 
 		setIsSubmitting(true);
 		try {
-			const response = await fetch("/api/projects", {
-				method: "POST",
+			const response = await fetch(`/api/projects/${project.id}`, {
+				method: "PUT",
 				body: formData,
+				credentials: "include",
 			});
 
 			if (!response.ok) {
 				const data = (await response.json().catch(() => null)) as {
 					error?: string;
 				} | null;
-				throw new Error(data?.error || "Failed to create project");
+				throw new Error(data?.error || "Failed to update project");
 			}
 
 			const data = (await response.json()) as { projectId: string };
@@ -239,18 +319,87 @@ function NewProject() {
 		}
 	};
 
+	const handleDelete = async () => {
+		const confirmed = window.confirm(
+			"Delete this project? All rooms and files will be removed.",
+		);
+		if (!confirmed) return;
+
+		setDeleteError(null);
+		setIsDeleting(true);
+
+		try {
+			const response = await fetch(`/api/projects/${project.id}`, {
+				method: "DELETE",
+				credentials: "include",
+			});
+
+			if (!response.ok) {
+				const data = (await response.json().catch(() => null)) as {
+					error?: string;
+				} | null;
+				throw new Error(data?.error || "Failed to delete project");
+			}
+
+			await navigate({
+				to: "/dashboard/home",
+				replace: true,
+			});
+		} catch (err) {
+			const message = err instanceof Error ? err.message : "Unknown error";
+			setDeleteError(message);
+		} finally {
+			setIsDeleting(false);
+		}
+	};
+
+	const handleOpenPreview = (
+		event: React.MouseEvent,
+		file?: File,
+		dataUrl?: string | null,
+	) => {
+		event.stopPropagation();
+		// If we already have a data URL, let the native anchor navigation happen.
+		if (!file && dataUrl) {
+			return;
+		}
+		// If we have a File (just uploaded), create an object URL and open it.
+		if (file) {
+			event.preventDefault();
+			const url = URL.createObjectURL(file);
+			window.open(url, "_blank", "noopener,noreferrer");
+			setTimeout(() => URL.revokeObjectURL(url), 1000);
+			return;
+		}
+		// No file or data URL: cancel navigation.
+		event.preventDefault();
+	};
+
 	return (
 		<div className="space-y-6">
-			<div>
-				<h1 className="text-2xl font-semibold text-black dark:text-white">
-					Create Project
-				</h1>
-				<p className="text-sm text-neutral-500 dark:text-neutral-400">
-					Provide the project details, add rooms, upload floor plans
-					(PDF/image), and optionally include a reference photo for each room.
-					If you skip a room photo, we will rely on the floor plan to generate a
-					photorealistic view.
-				</p>
+			<div className="flex items-center justify-between">
+				<div>
+					<h1 className="text-2xl font-semibold text-black dark:text-white">
+						Edit Project
+					</h1>
+					<p className="text-sm text-neutral-500 dark:text-neutral-400">
+						Update project details, manage rooms, and replace floor plans or
+						images. Existing files stay unchanged unless you upload a new one.
+					</p>
+				</div>
+				<div className="flex items-center gap-2">
+					<Link to="/dashboard/projects/$id" params={{ id: project.id }}>
+						<Button variant="outline">View project</Button>
+					</Link>
+					<Button
+						type="button"
+						variant="destructive"
+						onClick={handleDelete}
+						disabled={isSubmitting || isDeleting}
+					>
+						{isDeleting ? "Deleting..." : "Delete project"}
+					</Button>
+				</div>
 			</div>
 
 			<form onSubmit={handleSubmit} className="space-y-8">
@@ -286,7 +435,8 @@ function NewProject() {
 							<div>
 								<Label>Project floor plan (PDF/image)</Label>
 								<p className="text-xs text-neutral-500 dark:text-neutral-400">
-									Uploading here will copy the file to all rooms automatically.
+									Uploading here will copy the floor plan file to all rooms
+									without a floor plan.
 								</p>
 								<a
 									className="text-xs text-blue-600 underline dark:text-blue-400"
@@ -301,7 +451,7 @@ function NewProject() {
 							<FileUpload
 								id="project-floorplan-input"
 								key={`project-floorplan`}
-								containerClassName="min-h-[340px]"
+								containerClassName="min-h-[260px]"
 								files={projectFloorPlan ? [projectFloorPlan] : []}
 								accept={{
 									"application/pdf": [],
@@ -315,8 +465,6 @@ function NewProject() {
 										setProjectFloorPlan(file);
 										setRooms((prev) =>
 											prev.map((room) => {
-												// Only populate rooms that don't already have a custom floor plan
-												// or are already opted into project plans.
 												if (room.floorPlan) return room;
 												if (room.useProjectPlan === false) return room;
 												return {
@@ -329,16 +477,11 @@ function NewProject() {
 										return;
 									}
 
-									// Removal: clear project floor plan and any copied room floor plans
 									setProjectFloorPlan(undefined);
 									setRooms((prev) =>
 										prev.map((room) =>
 											room.useProjectPlan
-												? {
-														...room,
-														floorPlan: undefined,
-														useProjectPlan: false,
-													}
+												? { ...room, floorPlan: undefined }
 												: room,
 										),
 									);
@@ -367,12 +510,12 @@ function NewProject() {
 						type="multiple"
 						value={openRooms}
 						onValueChange={(values) => setOpenRooms(values)}
-						className="pt-2"
+						className="space-y-4"
 					>
 						{rooms.map((room, index) => (
 							<AccordionItem
-								value={room.id}
 								key={room.id}
+								value={room.id}
 								className="rounded-lg border border-neutral-200 px-4 dark:border-neutral-800"
 							>
 								<AccordionTrigger className="py-3 text-left">
@@ -382,7 +525,9 @@ function NewProject() {
 												Room {index + 1} — {room.name || "Untitled"}
 											</span>
 											<span className="text-xs text-neutral-500 dark:text-neutral-400">
-												Type: {room.type.replace("_", " ")}
+												{room.isExisting
+													? "Existing room — leave files empty to keep current ones."
+													: "New room — floor plan required."}
 											</span>
 										</div>
 										<Button
@@ -461,20 +606,39 @@ function NewProject() {
 										<div>
 											<Label>Room image (optional)</Label>
 											<div className="rounded-lg border border-dashed border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900/60">
-												<p className="mb-4 text-xs text-neutral-500 dark:text-neutral-400">
-													Sample living room image (optional reference):{" "}
-													<a
-														href="/room.jpg"
-														download
-														className="text-blue-600 underline dark:text-blue-400"
-													>
-														room.jpg
-													</a>
-												</p>
+												{room.imageDataUrl && (
+													<div className="mb-3 space-y-1 text-xs text-neutral-500 dark:text-neutral-400">
+														<p>Current image:</p>
+														<div className="flex gap-3">
+															{isLikelyImageUrl(room.imageDataUrl) && (
+																<img
+																	src={room.imageDataUrl}
+																	alt={`Room ${index + 1} current preview`}
+																	className="h-24 w-24 rounded object-cover border border-neutral-200 dark:border-neutral-800"
+																/>
+															)}
+															<a
+																href={room.imageDataUrl || undefined}
+																target="_blank"
+																rel="noopener noreferrer"
+																onClick={(e) =>
+																	handleOpenPreview(
+																		e,
+																		room.image,
+																		room.imageDataUrl,
+																	)
+																}
+																className="self-start text-blue-600 underline dark:text-blue-400"
+															>
+																View
+															</a>
+														</div>
+													</div>
+												)}
 												<FileUpload
 													key={`room-image-${room.id}`}
 													id={`room-image-input-${room.id}`}
-													containerClassName="min-h-[300px]"
+													containerClassName="min-h-[220px]"
 													accept={{
 														"image/png": [],
 														"image/jpeg": [],
@@ -491,6 +655,9 @@ function NewProject() {
 														{(room.image.size / (1024 * 1024)).toFixed(2)} MB)
 													</p>
 												)}
+												<p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">
+													Leave empty to keep the current image.
+												</p>
 											</div>
 										</div>
 										<div>
@@ -505,14 +672,77 @@ function NewProject() {
 													)}
 											</div>
 											<div className="rounded-lg border border-dashed border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900/60">
-												<p className="text-xs text-neutral-500 dark:text-neutral-400 mb-4">
+												{room.floorPlanDataUrl && (
+													<div className="mb-3 space-y-1 text-xs text-neutral-500 dark:text-neutral-400">
+														<p>Current floor plan:</p>
+														<div className="flex gap-3">
+															{isLikelyImageUrl(room.floorPlanDataUrl) && (
+																<img
+																	src={room.floorPlanDataUrl}
+																	alt={`Room ${index + 1} current plan preview`}
+																	className="h-24 w-24 rounded object-cover border border-neutral-200 dark:border-neutral-800"
+																/>
+															)}
+															<a
+																href={room.floorPlanDataUrl || undefined}
+																target="_blank"
+																rel="noopener noreferrer"
+																onClick={(e) =>
+																	handleOpenPreview(
+																		e,
+																		room.floorPlan,
+																		room.floorPlanDataUrl,
+																	)
+																}
+																className="self-start text-blue-600 underline dark:text-blue-400"
+															>
+																View
+															</a>
+														</div>
+													</div>
+												)}
+												{!room.floorPlanDataUrl &&
+													!room.floorPlan &&
+													room.useProjectPlan &&
+													projectDefaultFloorPlanUrl && (
+														<div className="mb-3 space-y-1 text-xs text-neutral-500 dark:text-neutral-400">
+															<p>Current floor plan (project default):</p>
+															<div className="flex gap-3">
+																{isLikelyImageUrl(
+																	projectDefaultFloorPlanUrl,
+																) && (
+																	<img
+																		src={projectDefaultFloorPlanUrl}
+																		alt={`Room ${index + 1} project default plan`}
+																		className="h-24 w-24 rounded object-cover border border-neutral-200 dark:border-neutral-800"
+																	/>
+																)}
+																<a
+																	href={projectDefaultFloorPlanUrl}
+																	target="_blank"
+																	rel="noopener noreferrer"
+																	onClick={(e) =>
+																		handleOpenPreview(
+																			e,
+																			room.floorPlan,
+																			projectDefaultFloorPlanUrl,
+																		)
+																	}
+																	className="self-start text-blue-600 underline dark:text-blue-400"
+																>
+																	View
+																</a>
+															</div>
+														</div>
+													)}
+												<p className="mb-4 text-xs text-neutral-500 dark:text-neutral-400">
 													Use a floor plan for this room or add a project floor
-													plan above to copy to all rooms.
+													plan above to copy to rooms
 												</p>
 												<FileUpload
 													key={`room-floorplan-${room.id}`}
 													id={`room-floorplan-input-${room.id}`}
-													containerClassName="min-h-[300px]"
+													containerClassName="min-h-[220px]"
 													files={
 														room.floorPlan
 															? [room.floorPlan]
@@ -528,18 +758,18 @@ function NewProject() {
 													}}
 													onChange={(files) => {
 														const file = files[0];
-														if (file) {
-															handleRoomUpdate(room.id, {
-																floorPlan: file,
-																useProjectPlan: false,
-															});
-															return;
-														}
-
-														// Explicitly clear the room's plan; it can be reassigned from project on next project upload
 														handleRoomUpdate(room.id, {
-															floorPlan: undefined,
-															useProjectPlan: false,
+															floorPlan: file ?? undefined,
+															useProjectPlan: file
+																? false
+																: Boolean(
+																		projectFloorPlan ||
+																			projectDefaultFloorPlanUrl,
+																	),
+															hasExistingFloorPlan:
+																room.hasExistingFloorPlan && !file
+																	? room.hasExistingFloorPlan
+																	: room.hasExistingFloorPlan,
 														});
 													}}
 												/>
@@ -549,13 +779,21 @@ function NewProject() {
 														{(room.floorPlan.size / (1024 * 1024)).toFixed(2)}{" "}
 														MB)
 													</p>
-												) : room.useProjectPlan && projectFloorPlan ? (
-													<p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">
-														Using project floor plan: {projectFloorPlan.name} (
-														{(projectFloorPlan.size / (1024 * 1024)).toFixed(2)}{" "}
-														MB)
-													</p>
 												) : null}
+												{!room.floorPlan &&
+													room.useProjectPlan &&
+													(projectFloorPlan || projectDefaultFloorPlanUrl) && (
+														<p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">
+															{projectFloorPlan
+																? `Using project floor plan: ${projectFloorPlan.name}`
+																: projectDefaultFloorPlanName
+																	? `Using project floor plan: ${projectDefaultFloorPlanName}`
+																	: "Using project floor plan"}
+														</p>
+													)}
+												<p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">
+													Leave empty to keep the current floor plan.
+												</p>
 											</div>
 										</div>
 									</div>
@@ -577,15 +815,20 @@ function NewProject() {
 				)}
 
 				<div className="flex items-center justify-end gap-3">
-					<Button type="submit" disabled={isSubmitting}>
-						{isSubmitting ? "Saving..." : "Save project"}
+					<Button type="submit" disabled={isSubmitting || isDeleting}>
+						{isSubmitting ? "Saving..." : "Save changes"}
 					</Button>
 				</div>
 			</form>
 
 			{submittedProjectId && (
 				<div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800 dark:border-green-900/60 dark:bg-green-950">
-					Project created successfully (id: {submittedProjectId}).
+					Project updated successfully (id: {submittedProjectId}).
+				</div>
+			)}
+			{deleteError && (
+				<div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950">
+					{deleteError}
 				</div>
 			)}
 			{submitError && (

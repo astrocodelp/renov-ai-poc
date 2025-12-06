@@ -1,6 +1,10 @@
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+	Link,
+	createFileRoute,
+	useNavigate,
+	redirect,
+} from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useStore } from "@nanostores/react";
 import { authClient } from "@/lib/auth-client";
 import { Github, Loader2, LogIn, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -10,6 +14,7 @@ const providers = [
 	{
 		id: "github" as const,
 		label: "Continue with GitHub",
+		disabled: false,
 		icon: <Github className="h-5 w-5" />,
 	},
 	{
@@ -45,11 +50,25 @@ const providers = [
 ];
 
 export const Route = createFileRoute("/login")({
+	beforeLoad: async ({ context }) => {
+		// On the server, redirect authenticated users away from the login page
+		if (typeof window === "undefined") {
+			const { auth } = await import("@/lib/auth");
+			const request = (context as { request?: Request } | undefined)?.request;
+			const session = await auth.api.getSession({
+				headers: request?.headers ?? new Headers(),
+			});
+			if (session) {
+				throw redirect({ to: "/dashboard", replace: true });
+			}
+		}
+		return undefined;
+	},
 	component: LoginRouteComponent,
 });
 
 function LoginRouteComponent() {
-	const session = useStore(authClient.useSession);
+	const { data: session } = authClient.useSession();
 	const navigate = useNavigate();
 	const [error, setError] = useState<string | null>(null);
 	const [email, setEmail] = useState("");
@@ -58,24 +77,37 @@ function LoginRouteComponent() {
 	const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (session.data?.user) {
+		if (session?.user) {
 			navigate({ to: "/dashboard" });
 		}
-	}, [navigate, session.data?.user]);
+	}, [navigate, session?.user]);
 
 	const handleSocialLogin = async (provider: "github" | "google") => {
 		setError(null);
 		setLoadingProvider(provider);
 		try {
-			await authClient.signIn.social({
+			const result = await authClient.signIn.social({
 				provider,
 				callbackURL: "/dashboard",
 				errorCallbackURL: "/login",
 			});
+
+			// Some adapters auto-redirect; if not, fall back to an explicit redirect
+			const url =
+				// Better Auth may return a url directly
+				(result as { url?: string } | undefined)?.url ??
+				// Or nested under data
+				(result as { data?: { url?: string } } | undefined)?.data?.url;
+
+			if (url) {
+				window.location.href = url;
+				return;
+			}
 		} catch (err) {
 			const message =
 				err instanceof Error ? err.message : "Unable to start sign-in flow";
 			setError(message);
+		} finally {
 			setLoadingProvider(null);
 		}
 	};
@@ -146,9 +178,7 @@ function LoginRouteComponent() {
 									autoComplete="email"
 									value={email}
 									onChange={(e) => setEmail(e.target.value)}
-									disabled={
-										session.isPending || Boolean(session.data) || loadingEmail
-									}
+									disabled={Boolean(session) || loadingEmail}
 									required
 								/>
 							</div>
@@ -161,17 +191,13 @@ function LoginRouteComponent() {
 									autoComplete="current-password"
 									value={password}
 									onChange={(e) => setPassword(e.target.value)}
-									disabled={
-										session.isPending || Boolean(session.data) || loadingEmail
-									}
+									disabled={Boolean(session) || loadingEmail}
 									required
 								/>
 							</div>
 							<button
 								type="submit"
-								disabled={
-									session.isPending || Boolean(session.data) || loadingEmail
-								}
+								disabled={Boolean(session) || loadingEmail}
 								className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
 							>
 								{loadingEmail ? (
@@ -207,14 +233,11 @@ function LoginRouteComponent() {
 							<button
 								type="button"
 								key={provider.id}
-								onClick={() => handleSocialLogin(provider.id)}
-								disabled={
-									provider.disabled ||
-									session.isPending ||
-									Boolean(session.data) ||
-									Boolean(loadingProvider) ||
-									loadingEmail
-								}
+								onClick={() => {
+									console.log("Social login clicked:", provider.id);
+									handleSocialLogin(provider.id);
+								}}
+								disabled={provider.disabled}
 								className="inline-flex items-center justify-center gap-3 rounded-xl border border-border bg-card hover:bg-muted px-4 py-3 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary/60 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
 							>
 								{loadingProvider === provider.id ? (

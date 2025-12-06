@@ -7,7 +7,8 @@ import {
 	useRouter,
 	redirect,
 } from "@tanstack/react-router";
-import { useStore } from "@nanostores/react";
+import { createServerFn } from "@tanstack/react-start";
+import { auth } from "@/lib/auth";
 import {
 	ChevronDown,
 	ChevronRight,
@@ -33,13 +34,16 @@ import { authMiddleware } from "@/middleware/auth";
 type Project = {
 	id: string;
 	name: string;
-	status: string;
-	updated: string;
+	roomCount: number;
+	createdAt: string;
+	updatedAt: string;
 };
 
 // Layout route for all /dashboard/* pages
 export const Route = createFileRoute("/dashboard")({
 	component: DashboardLayout,
+	loader: async (): Promise<{ projects: Project[] }> =>
+		getProjects() as Promise<{ projects: Project[] }>,
 	server: {
 		middleware: [authMiddleware],
 	},
@@ -48,19 +52,18 @@ export const Route = createFileRoute("/dashboard")({
 		if (normalized === "/dashboard") {
 			throw redirect({ to: "/dashboard/home", replace: true });
 		}
+		return undefined as never;
 	},
 });
 
 function DashboardLayout() {
+	const { projects } = Route.useLoaderData();
 	const navigate = useNavigate();
 	const router = useRouter();
-	const session = useStore(authClient.useSession);
+	const { data: session } = authClient.useSession();
 	const [isLoggingOut, setIsLoggingOut] = React.useState(false);
 	const [sidebarOpen, setSidebarOpen] = React.useState(false);
 	const [projectsOpen, setProjectsOpen] = React.useState(true);
-
-	// Placeholder data until projects are wired to backend.
-	const projects: Project[] = [];
 
 	React.useEffect(() => {
 		const timer = setTimeout(() => {
@@ -90,7 +93,7 @@ function DashboardLayout() {
 				onMouseEnter={() => setSidebarOpen(true)}
 				onMouseLeave={() => setSidebarOpen(false)}
 				className={cn(
-					"group sticky top-0 relative flex h-screen flex-col border-r border-sidebar-border bg-sidebar backdrop-blur-xl transition-[width] duration-300 shrink-0 overflow-hidden",
+					"group sticky top-0 flex h-screen flex-col border-r border-sidebar-border bg-sidebar backdrop-blur-xl transition-[width] duration-300 shrink-0 overflow-hidden",
 					sidebarOpen ? "w-72" : "w-20",
 				)}
 			>
@@ -165,47 +168,60 @@ function DashboardLayout() {
 								</Link>
 							)}
 						</div>
-						<CollapsibleContent className="px-2 pt-1 space-y-1 overflow-hidden">
-							{projects.length === 0 && sidebarOpen ? (
-								<div className="rounded-lg border border-dashed border-sidebar-border bg-sidebar p-3 text-sm text-muted-foreground">
-									No projects yet. Create your first one to get started.
-									<div className="mt-3">
-										<Link to="/dashboard/projects/new">
-											<Button
-												variant="outline"
-												size="sm"
-												className="w-full justify-center border-primary/30 text-foreground bg-primary/5 hover:bg-primary/15"
-											>
-												<Plus className="size-4" />
-												Add project
-											</Button>
-										</Link>
+						{sidebarOpen ? (
+							<CollapsibleContent className="px-2 pt-1 space-y-1 overflow-hidden">
+								{projects.length === 0 ? (
+									<div className="rounded-lg border border-dashed border-sidebar-border bg-sidebar p-3 text-sm text-muted-foreground">
+										No projects yet. Create your first one to get started.
+										<div className="mt-3">
+											<Link to="/dashboard/projects/new">
+												<Button
+													variant="outline"
+													size="sm"
+													className="w-full justify-center border-primary/30 text-foreground bg-primary/5 hover:bg-primary/15"
+												>
+													<Plus className="size-4" />
+													Add project
+												</Button>
+											</Link>
+										</div>
 									</div>
-								</div>
-							) : null}
+								) : null}
 
-							{projects.length > 0 ? (
-								<div className="space-y-1">
-									{projects.map((project) => (
-										<Link
-											key={project.id}
-											to={`/dashboard/projects/${project.id}`}
-											className="block rounded-lg px-3 py-2 hover:bg-sidebar-accent/50 transition-colors"
-										>
-											<p className="text-sm font-medium text-foreground">
-												{project.name}
-											</p>
-											<div className="text-xs text-muted-foreground flex items-center gap-2">
-												<span className="rounded-full bg-primary/15 px-2 py-0.5 text-foreground">
-													{project.status}
-												</span>
-												<span>{project.updated}</span>
-											</div>
-										</Link>
-									))}
-								</div>
-							) : null}
-						</CollapsibleContent>
+								{projects.length > 0 ? (
+									<div className="space-y-1">
+										{projects.map((project: Project) => (
+											<Link
+												key={project.id}
+												to="/dashboard/projects/$id"
+												params={{ id: project.id }}
+												className="block rounded-lg px-3 py-2 hover:bg-sidebar-accent/50 transition-colors"
+												activeProps={{
+													className: cn(
+														"block rounded-lg px-3 py-2 bg-primary/15 border border-primary/40 text-foreground shadow-sm",
+														"hover:bg-primary/20",
+													),
+												}}
+												activeOptions={{ exact: false }}
+											>
+												<p className="text-sm font-medium text-foreground">
+													{project.name}
+												</p>
+												<div className="text-xs text-muted-foreground flex items-center gap-2">
+													<span className="rounded-full bg-primary/15 px-2 py-0.5 text-foreground">
+														{project.roomCount} rooms
+													</span>
+													<span>
+														Updated{" "}
+														{new Date(project.updatedAt).toLocaleDateString()}
+													</span>
+												</div>
+											</Link>
+										))}
+									</div>
+								) : null}
+							</CollapsibleContent>
+						) : null}
 					</Collapsible>
 
 					<div className="pt-4">
@@ -247,7 +263,7 @@ function DashboardLayout() {
 						{sidebarOpen && (
 							<div className="leading-tight overflow-hidden">
 								<p className="text-sm font-semibold text-foreground truncate">
-									{session.data?.user.name ?? session.data?.user.email ?? ""}
+									{session?.user.name ?? session?.user.email ?? ""}
 								</p>
 								<p className="text-xs text-muted-foreground">Signed in</p>
 							</div>
@@ -274,6 +290,46 @@ function DashboardLayout() {
 		</div>
 	);
 }
+
+const getProjects = createServerFn({ method: "GET" }).handler(
+	// @ts-expect-error server fn ctx typing friction
+	async ({
+		request,
+	}: {
+		request: Request;
+	}): Promise<{ projects: Project[] }> => {
+		const session = await auth.api.getSession({
+			headers: request.headers,
+		});
+		if (!session) {
+			throw redirect({ to: "/login", replace: true });
+		}
+
+		const { prisma } = await import("@/db");
+
+		const projectsRaw = await prisma.project.findMany({
+			where: { ownerId: session.user.id },
+			select: {
+				id: true,
+				name: true,
+				createdAt: true,
+				updatedAt: true,
+				rooms: { select: { id: true } },
+			},
+			orderBy: { updatedAt: "desc" },
+		});
+
+		return {
+			projects: projectsRaw.map((p) => ({
+				id: p.id,
+				name: p.name,
+				roomCount: p.rooms.length,
+				createdAt: p.createdAt.toISOString(),
+				updatedAt: p.updatedAt.toISOString(),
+			})),
+		};
+	},
+);
 
 type SidebarLinkProps = {
 	to: string;

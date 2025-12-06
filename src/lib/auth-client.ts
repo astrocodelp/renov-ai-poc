@@ -1,4 +1,4 @@
-import { createAuthClient } from "better-auth/client";
+import { createAuthClient } from "better-auth/react";
 import { env } from "@/env";
 
 // Better Auth client requires an absolute baseURL. Build it from window origin on the client,

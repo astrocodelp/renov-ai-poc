@@ -29,11 +29,15 @@ import { Route as DashboardSettingsBasicRouteImport } from './routes/dashboard/s
 import { Route as DashboardSettingsAuthRouteImport } from './routes/dashboard/settings/auth'
 import { Route as DashboardProjectsNewRouteImport } from './routes/dashboard/projects/new'
 import { Route as ApiSettingsAccountRouteImport } from './routes/api/settings/account'
+import { Route as ApiProjectsIdRouteImport } from './routes/api/projects.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as DashboardProjectsIdRouteRouteImport } from './routes/dashboard/projects/$id/route'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
+import { Route as DashboardProjectsIdIndexRouteImport } from './routes/dashboard/projects/$id/index'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
+import { Route as DashboardProjectsIdEditRouteImport } from './routes/dashboard/projects/$id/edit'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -135,16 +139,33 @@ const ApiSettingsAccountRoute = ApiSettingsAccountRouteImport.update({
   path: '/api/settings/account',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiProjectsIdRoute = ApiProjectsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiProjectsRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardProjectsIdRouteRoute =
+  DashboardProjectsIdRouteRouteImport.update({
+    id: '/projects/$id',
+    path: '/projects/$id',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
   id: '/demo/start/ssr/',
   path: '/demo/start/ssr/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardProjectsIdIndexRoute =
+  DashboardProjectsIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardProjectsIdRouteRoute,
+  } as any)
 const DemoStartSsrSpaModeRoute = DemoStartSsrSpaModeRouteImport.update({
   id: '/demo/start/ssr/spa-mode',
   path: '/demo/start/ssr/spa-mode',
@@ -160,6 +181,11 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
   path: '/demo/start/ssr/data-only',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardProjectsIdEditRoute = DashboardProjectsIdEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => DashboardProjectsIdRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -167,11 +193,13 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/signup': typeof SignupRoute
-  '/api/projects': typeof ApiProjectsRoute
+  '/api/projects': typeof ApiProjectsRouteWithChildren
   '/demo/mcp-todos': typeof DemoMcpTodosRoute
   '/demo/prisma': typeof DemoPrismaRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/projects/$id': typeof DashboardProjectsIdRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/projects/$id': typeof ApiProjectsIdRoute
   '/api/settings/account': typeof ApiSettingsAccountRoute
   '/dashboard/projects/new': typeof DashboardProjectsNewRoute
   '/dashboard/settings/auth': typeof DashboardSettingsAuthRoute
@@ -183,9 +211,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/home': typeof DashboardHomeIndexRoute
   '/dashboard/projects': typeof DashboardProjectsIndexRoute
   '/dashboard/settings': typeof DashboardSettingsIndexRoute
+  '/dashboard/projects/$id/edit': typeof DashboardProjectsIdEditRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/dashboard/projects/$id/': typeof DashboardProjectsIdIndexRoute
   '/demo/start/ssr': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesByTo {
@@ -193,11 +223,12 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/signup': typeof SignupRoute
-  '/api/projects': typeof ApiProjectsRoute
+  '/api/projects': typeof ApiProjectsRouteWithChildren
   '/demo/mcp-todos': typeof DemoMcpTodosRoute
   '/demo/prisma': typeof DemoPrismaRoute
   '/dashboard': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/projects/$id': typeof ApiProjectsIdRoute
   '/api/settings/account': typeof ApiSettingsAccountRoute
   '/dashboard/projects/new': typeof DashboardProjectsNewRoute
   '/dashboard/settings/auth': typeof DashboardSettingsAuthRoute
@@ -209,9 +240,11 @@ export interface FileRoutesByTo {
   '/dashboard/home': typeof DashboardHomeIndexRoute
   '/dashboard/projects': typeof DashboardProjectsIndexRoute
   '/dashboard/settings': typeof DashboardSettingsIndexRoute
+  '/dashboard/projects/$id/edit': typeof DashboardProjectsIdEditRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/dashboard/projects/$id': typeof DashboardProjectsIdIndexRoute
   '/demo/start/ssr': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesById {
@@ -221,11 +254,13 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/signup': typeof SignupRoute
-  '/api/projects': typeof ApiProjectsRoute
+  '/api/projects': typeof ApiProjectsRouteWithChildren
   '/demo/mcp-todos': typeof DemoMcpTodosRoute
   '/demo/prisma': typeof DemoPrismaRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/projects/$id': typeof DashboardProjectsIdRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/projects/$id': typeof ApiProjectsIdRoute
   '/api/settings/account': typeof ApiSettingsAccountRoute
   '/dashboard/projects/new': typeof DashboardProjectsNewRoute
   '/dashboard/settings/auth': typeof DashboardSettingsAuthRoute
@@ -237,9 +272,11 @@ export interface FileRoutesById {
   '/dashboard/home/': typeof DashboardHomeIndexRoute
   '/dashboard/projects/': typeof DashboardProjectsIndexRoute
   '/dashboard/settings/': typeof DashboardSettingsIndexRoute
+  '/dashboard/projects/$id/edit': typeof DashboardProjectsIdEditRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/dashboard/projects/$id/': typeof DashboardProjectsIdIndexRoute
   '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
 }
 export interface FileRouteTypes {
@@ -254,7 +291,9 @@ export interface FileRouteTypes {
     | '/demo/mcp-todos'
     | '/demo/prisma'
     | '/dashboard/'
+    | '/dashboard/projects/$id'
     | '/api/auth/$'
+    | '/api/projects/$id'
     | '/api/settings/account'
     | '/dashboard/projects/new'
     | '/dashboard/settings/auth'
@@ -266,9 +305,11 @@ export interface FileRouteTypes {
     | '/dashboard/home'
     | '/dashboard/projects'
     | '/dashboard/settings'
+    | '/dashboard/projects/$id/edit'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/dashboard/projects/$id/'
     | '/demo/start/ssr'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -281,6 +322,7 @@ export interface FileRouteTypes {
     | '/demo/prisma'
     | '/dashboard'
     | '/api/auth/$'
+    | '/api/projects/$id'
     | '/api/settings/account'
     | '/dashboard/projects/new'
     | '/dashboard/settings/auth'
@@ -292,9 +334,11 @@ export interface FileRouteTypes {
     | '/dashboard/home'
     | '/dashboard/projects'
     | '/dashboard/settings'
+    | '/dashboard/projects/$id/edit'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/dashboard/projects/$id'
     | '/demo/start/ssr'
   id:
     | '__root__'
@@ -307,7 +351,9 @@ export interface FileRouteTypes {
     | '/demo/mcp-todos'
     | '/demo/prisma'
     | '/dashboard/'
+    | '/dashboard/projects/$id'
     | '/api/auth/$'
+    | '/api/projects/$id'
     | '/api/settings/account'
     | '/dashboard/projects/new'
     | '/dashboard/settings/auth'
@@ -319,9 +365,11 @@ export interface FileRouteTypes {
     | '/dashboard/home/'
     | '/dashboard/projects/'
     | '/dashboard/settings/'
+    | '/dashboard/projects/$id/edit'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/dashboard/projects/$id/'
     | '/demo/start/ssr/'
   fileRoutesById: FileRoutesById
 }
@@ -331,7 +379,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
   SignupRoute: typeof SignupRoute
-  ApiProjectsRoute: typeof ApiProjectsRoute
+  ApiProjectsRoute: typeof ApiProjectsRouteWithChildren
   DemoMcpTodosRoute: typeof DemoMcpTodosRoute
   DemoPrismaRoute: typeof DemoPrismaRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -488,6 +536,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSettingsAccountRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/projects/$id': {
+      id: '/api/projects/$id'
+      path: '/$id'
+      fullPath: '/api/projects/$id'
+      preLoaderRoute: typeof ApiProjectsIdRouteImport
+      parentRoute: typeof ApiProjectsRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -495,12 +550,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/projects/$id': {
+      id: '/dashboard/projects/$id'
+      path: '/projects/$id'
+      fullPath: '/dashboard/projects/$id'
+      preLoaderRoute: typeof DashboardProjectsIdRouteRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/demo/start/ssr/': {
       id: '/demo/start/ssr/'
       path: '/demo/start/ssr'
       fullPath: '/demo/start/ssr'
       preLoaderRoute: typeof DemoStartSsrIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/projects/$id/': {
+      id: '/dashboard/projects/$id/'
+      path: '/'
+      fullPath: '/dashboard/projects/$id/'
+      preLoaderRoute: typeof DashboardProjectsIdIndexRouteImport
+      parentRoute: typeof DashboardProjectsIdRouteRoute
     }
     '/demo/start/ssr/spa-mode': {
       id: '/demo/start/ssr/spa-mode'
@@ -523,11 +592,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStartSsrDataOnlyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/projects/$id/edit': {
+      id: '/dashboard/projects/$id/edit'
+      path: '/edit'
+      fullPath: '/dashboard/projects/$id/edit'
+      preLoaderRoute: typeof DashboardProjectsIdEditRouteImport
+      parentRoute: typeof DashboardProjectsIdRouteRoute
+    }
   }
 }
 
+interface DashboardProjectsIdRouteRouteChildren {
+  DashboardProjectsIdEditRoute: typeof DashboardProjectsIdEditRoute
+  DashboardProjectsIdIndexRoute: typeof DashboardProjectsIdIndexRoute
+}
+
+const DashboardProjectsIdRouteRouteChildren: DashboardProjectsIdRouteRouteChildren =
+  {
+    DashboardProjectsIdEditRoute: DashboardProjectsIdEditRoute,
+    DashboardProjectsIdIndexRoute: DashboardProjectsIdIndexRoute,
+  }
+
+const DashboardProjectsIdRouteRouteWithChildren =
+  DashboardProjectsIdRouteRoute._addFileChildren(
+    DashboardProjectsIdRouteRouteChildren,
+  )
+
 interface DashboardRouteRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardProjectsIdRouteRoute: typeof DashboardProjectsIdRouteRouteWithChildren
   DashboardProjectsNewRoute: typeof DashboardProjectsNewRoute
   DashboardSettingsAuthRoute: typeof DashboardSettingsAuthRoute
   DashboardSettingsBasicRoute: typeof DashboardSettingsBasicRoute
@@ -538,6 +631,7 @@ interface DashboardRouteRouteChildren {
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardProjectsIdRouteRoute: DashboardProjectsIdRouteRouteWithChildren,
   DashboardProjectsNewRoute: DashboardProjectsNewRoute,
   DashboardSettingsAuthRoute: DashboardSettingsAuthRoute,
   DashboardSettingsBasicRoute: DashboardSettingsBasicRoute,
@@ -550,13 +644,25 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
   DashboardRouteRouteChildren,
 )
 
+interface ApiProjectsRouteChildren {
+  ApiProjectsIdRoute: typeof ApiProjectsIdRoute
+}
+
+const ApiProjectsRouteChildren: ApiProjectsRouteChildren = {
+  ApiProjectsIdRoute: ApiProjectsIdRoute,
+}
+
+const ApiProjectsRouteWithChildren = ApiProjectsRoute._addFileChildren(
+  ApiProjectsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   McpRoute: McpRoute,
   SignupRoute: SignupRoute,
-  ApiProjectsRoute: ApiProjectsRoute,
+  ApiProjectsRoute: ApiProjectsRouteWithChildren,
   DemoMcpTodosRoute: DemoMcpTodosRoute,
   DemoPrismaRoute: DemoPrismaRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

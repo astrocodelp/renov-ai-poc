@@ -14,7 +14,8 @@ type AccountAction =
 			action: "change-password";
 			currentPassword?: string;
 			newPassword?: string;
-	  };
+	  }
+	| { action: "delete-account"; confirmation?: string };
 
 const json = (status: number, data: unknown) =>
 	new Response(JSON.stringify(data), {
@@ -117,6 +118,12 @@ export const Route = createFileRoute("/api/settings/account")({
 							},
 						});
 
+						// Force Better Auth to update the session cookie with new user data
+						await auth.api.updateUser({
+							headers: request.headers,
+							body: { name },
+						});
+
 						return json(200, { status: "profile_updated", user: updatedUser });
 					}
 					case "revoke-session": {
@@ -203,6 +210,18 @@ export const Route = createFileRoute("/api/settings/account")({
 									: "Unable to change password";
 							return json(400, { error: message });
 						}
+					}
+					case "delete-account": {
+						const confirmation = (body.confirmation ?? "").trim().toLowerCase();
+
+						if (confirmation !== "confirm") {
+							return json(400, {
+								error: 'You must type "confirm" to delete your account',
+							});
+						}
+
+						await prisma.user.delete({ where: { id: userId } });
+						return json(200, { status: "account_deleted" });
 					}
 					default:
 						return json(400, { error: "Unknown action" });

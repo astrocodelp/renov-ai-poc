@@ -11,13 +11,17 @@ enum RoomType {
 model Project {
   id        String   @id @default(uuid())
   name      String
+  description String?
   ownerId   String
   owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  defaultFloorPlanFileId String?
+  defaultFloorPlanFile   File?   @relation("ProjectDefaultFloorPlanFile", fields: [defaultFloorPlanFileId], references: [id], onDelete: Cascade)
   rooms     Room[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([ownerId])
+  @@unique([defaultFloorPlanFileId])
   @@map("project")
 }
 
@@ -26,13 +30,41 @@ model Room {
   projectId String
   project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   name      String
+  description String?
   type      RoomType
-  floorPlan Bytes
-  image     Bytes
+  floorPlanFileId String
+  floorPlanFile   File    @relation("RoomFloorPlanFile", fields: [floorPlanFileId], references: [id], onDelete: Cascade)
+  imageFileId     String?
+  imageFile       File?   @relation("RoomImageFile", fields: [imageFileId], references: [id], onDelete: Cascade)
+  generatedImageFileId String?
+  generatedImageFile   File?   @relation("RoomGeneratedImageFile", fields: [generatedImageFileId], references: [id], onDelete: Cascade)
+  generatedVideoFileId String?
+  generatedVideoFile   File?   @relation("RoomGeneratedVideoFile", fields: [generatedVideoFileId], references: [id], onDelete: Cascade)
   geometry  Json?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
   @@index([projectId])
+  @@unique([floorPlanFileId])
+  @@unique([imageFileId])
+  @@unique([generatedImageFileId])
+  @@unique([generatedVideoFileId])
   @@map("room")
+}
+
+model File {
+  id        String   @id @default(uuid())
+  name      String
+  mimeType  String
+  bytes     Bytes
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  roomFloorPlan      Room? @relation("RoomFloorPlanFile")
+  roomImage          Room? @relation("RoomImageFile")
+  roomGeneratedImage Room? @relation("RoomGeneratedImageFile")
+  roomGeneratedVideo Room? @relation("RoomGeneratedVideoFile")
+  projectDefaultFloorPlan Project? @relation("ProjectDefaultFloorPlanFile")
+
+  @@map("file")
 }

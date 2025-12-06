@@ -1,17 +1,20 @@
-import { createRouter } from '@tanstack/react-router'
-import { NotFound } from './routes/__root'
+import { createRouter } from "@tanstack/react-router";
+import { NotFound } from "./routes/__root";
 
 // Import the generated route tree
-import { routeTree } from './routeTree.gen'
+import { routeTree } from "./routeTree.gen";
 
 // Create a new router instance
 export const getRouter = () => {
-  const router = createRouter({
-    routeTree,
-    scrollRestoration: true,
-    defaultPreloadStaleTime: 0,
-    defaultNotFoundComponent: NotFound,
-  })
+	const router = createRouter({
+		routeTree,
+		scrollRestoration: true,
+		defaultPreloadStaleTime: 0,
+		defaultNotFoundComponent: NotFound,
+	});
 
-  return router
-}
+	return router;
+};
+
+// Some tooling expects a default export with getRouter on it.
+export default { getRouter };
