@@ -1,8 +1,8 @@
 
 generator client {
   provider = "prisma-client"
-  // Generate the client in `src/generated/prisma` at the repo root
-  output   = "../../src/generated/prisma"
+  // Generate outside src folder to prevent client bundling
+  output   = "../src/generated/prisma"
 }
 
 datasource db {

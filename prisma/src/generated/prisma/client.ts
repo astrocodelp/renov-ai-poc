@@ -69,3 +69,8 @@ export type Project = Prisma.ProjectModel
  * 
  */
 export type Room = Prisma.RoomModel
+/**
+ * Model File
+ * 
+ */
+export type File = Prisma.FileModel

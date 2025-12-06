@@ -111,7 +111,7 @@ function SignupRouteComponent() {
 							Create your account
 						</span>
 						<h1 className="text-3xl font-bold leading-tight font-display">
-							Join Rinnov.ai
+							Join Rennov.ai
 						</h1>
 						<p className="text-muted-foreground">
 							Google provider verification is still pending. Please use GitHub

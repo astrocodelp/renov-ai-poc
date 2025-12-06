@@ -33,10 +33,10 @@ function App() {
 					<div className="flex items-center gap-2">
 						<img
 							src="/logo_192.png"
-							alt="Rinnov.ai logo"
+							alt="Rennov.ai logo"
 							className="w-10 h-10 rounded-xl object-contain bg-primary/10 p-1"
 						/>
-						<span className="text-xl font-bold font-display">Rinnov.ai</span>
+						<span className="text-xl font-bold font-display">Rennov.ai</span>
 					</div>
 					<div className="hidden md:flex items-center gap-8">
 						<a
@@ -104,8 +104,7 @@ function App() {
 
 						<p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
 							Upload floor plans, snap photos, and watch AI generate
-							photorealistic renovations with precise coordinates. Create
-							stunning 3D walkthroughs in minutes.
+							photorealistic renovations with precise coordinates.
 						</p>
 
 						<div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -190,7 +189,7 @@ function App() {
 							Everything You Need to Design
 						</h2>
 						<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-							From floor plans to photorealistic renders, Rinnov.ai provides all
+							From floor plans to photorealistic renders, Rennov.ai provides all
 							the tools interior designers need to bring their vision to life.
 						</p>
 					</motion.div>
@@ -220,7 +219,7 @@ function App() {
 							Discover What AI Can Do
 						</h2>
 						<p className="text-lg text-muted-foreground max-w-2xl">
-							Explore the powerful AI features that make Rinnov.ai the ultimate
+							Explore the powerful AI features that make Rennov.ai the ultimate
 							tool for interior designers and architects.
 						</p>
 					</motion.div>
@@ -308,7 +307,7 @@ function App() {
 							Built with Modern Tech
 						</h2>
 						<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-							Rinnov.ai leverages cutting-edge technologies to deliver a
+							Rennov.ai leverages cutting-edge technologies to deliver a
 							seamless, powerful experience for interior designers.
 						</p>
 					</motion.div>
@@ -426,10 +425,10 @@ function App() {
 							<div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
 								<Home className="w-4 h-4 text-primary-foreground" />
 							</div>
-							<span className="font-bold font-display">Rinnov.ai</span>
+							<span className="font-bold font-display">Rennov.ai</span>
 						</div>
 						<p className="text-sm text-muted-foreground">
-							© 2025 Rinnov.ai. Built with ❤️ for the Prisma Hackathon.
+							© 2025 Rennov.ai. Built with ❤️ for the Prisma Hackathon.
 						</p>
 						<div className="flex items-center gap-6">
 							<a
@@ -467,10 +466,6 @@ const featureCards = [
 	{
 		title: "AI Photo Generation",
 		src: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&h=600&fit=crop",
-	},
-	{
-		title: "3D Walkthrough Videos",
-		src: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop",
 	},
 	{
 		title: "Smart Measurements",
@@ -655,7 +650,7 @@ const carouselItems = [
 			title: "Smart Measurements",
 			category: "Precision Tools",
 			content: (
-				<AICapabilityContent description="Never guess dimensions again. Place camera views on your floor plan and Rinnov.ai calculates exact coordinates and viewing angles. Every generated image maintains perfect scale relationships, ensuring furniture fits, sightlines work, and proportions are always accurate." />
+				<AICapabilityContent description="Never guess dimensions again. Place camera views on your floor plan and Rennov.ai calculates exact coordinates and viewing angles. Every generated image maintains perfect scale relationships, ensuring furniture fits, sightlines work, and proportions are always accurate." />
 			),
 		}}
 	/>,

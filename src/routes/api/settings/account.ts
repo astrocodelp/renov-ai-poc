@@ -1,8 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { prisma } from "@/db";
-import { auth } from "@/lib/auth";
-
 type AccountAction =
 	| { action: "update-profile"; name?: string }
 	| { action: "revoke-session"; sessionId?: string }
@@ -27,6 +24,8 @@ export const Route = createFileRoute("/api/settings/account")({
 	server: {
 		handlers: {
 			GET: async ({ request }) => {
+				const { auth } = await import("@/lib/auth.server");
+				const { prisma } = await import("@/db.server");
 				const session = await auth.api.getSession({ headers: request.headers });
 				if (!session) {
 					return json(401, { error: "Unauthorized" });
@@ -79,6 +78,8 @@ export const Route = createFileRoute("/api/settings/account")({
 				return json(200, { user, sessions, accounts });
 			},
 			POST: async ({ request }) => {
+				const { auth } = await import("@/lib/auth.server");
+				const { prisma } = await import("@/db.server");
 				const session = await auth.api.getSession({ headers: request.headers });
 				if (!session) {
 					return json(401, { error: "Unauthorized" });

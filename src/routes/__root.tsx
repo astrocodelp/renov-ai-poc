@@ -24,10 +24,10 @@ export const Route = createRootRoute({
 				content: "MyWebSite",
 			},
 			{
-				title: "Rinnov.ai - Interior Design AI",
-				description: "Rinnov.ai for interior designers and architects",
+				title: "Rennov.ai - Interior Design AI",
+				description: "Rennov.ai for interior designers and architects",
 				keywords:
-					"Rinnov.ai, POC, Renovation, AI, 3D, Walkthrough, Video, Presentation",
+					"Rennov.ai, POC, Renovation, AI, 3D, Walkthrough, Video, Presentation",
 				author: "astrocode.tech",
 			},
 		],

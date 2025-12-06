@@ -1,4 +1,9 @@
-import { createFileRoute, getRouteApi, Link } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	getRouteApi,
+	Link,
+	useRouter,
+} from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +16,7 @@ import {
 	AccordionTrigger,
 } from "@/components/ui/accordion";
 
-import type { ProjectDetail } from "./route";
+import { generateRoomImage, type ProjectDetail } from "./route";
 
 type RenovationStatus = "idle" | "submitting" | "success" | "error";
 type RenovationRequest = {
@@ -19,12 +24,14 @@ type RenovationRequest = {
 	prompt: string;
 	status: RenovationStatus;
 	message?: string;
+	generatedImageDataUrl?: string;
 };
 
 const dataUrlToObjectUrl = (dataUrl: string, fallbackMime?: string) => {
 	if (!dataUrl.startsWith("data:")) return dataUrl;
 	const [meta, content] = dataUrl.split(",");
-	const mime = meta.match(/data:([^;]+)/)?.[1] ?? fallbackMime ?? "application/pdf";
+	const mime =
+		meta.match(/data:([^;]+)/)?.[1] ?? fallbackMime ?? "application/pdf";
 	const isBase64 = meta.includes(";base64");
 	const binary = isBase64 ? atob(content) : decodeURIComponent(content);
 	const bytes = new Uint8Array(binary.length);
@@ -171,6 +178,7 @@ export const Route = createFileRoute("/dashboard/projects/$id/")({
 function ProjectDetailPage() {
 	// Use the parent route's loader data
 	const project = parentRoute.useLoaderData() as ProjectDetail;
+	const router = useRouter();
 
 	const [pdfPreviewUrls, setPdfPreviewUrls] = useState<Record<string, string>>(
 		{},
@@ -184,7 +192,8 @@ function ProjectDetailPage() {
 				{
 					style: STYLE_OPTIONS[0]?.value ?? "modern",
 					prompt: "",
-					status: "idle",
+					status: room.generatedImageDataUrl ? "success" : "idle",
+					generatedImageDataUrl: room.generatedImageDataUrl ?? undefined,
 				},
 			]),
 		),
@@ -202,7 +211,7 @@ function ProjectDetailPage() {
 			if (isPdf && room.floorPlanDataUrl) {
 				const url = dataUrlToObjectUrl(
 					room.floorPlanDataUrl,
-					room.floorPlanMimeType,
+					room.floorPlanMimeType ?? undefined,
 				);
 				if (url.startsWith("blob:")) revoke.push(url);
 				urls.push([room.id, url]);
@@ -211,7 +220,11 @@ function ProjectDetailPage() {
 
 		setPdfPreviewUrls(Object.fromEntries(urls));
 
-		return () => revoke.forEach((url) => URL.revokeObjectURL(url));
+		return () => {
+			for (const url of revoke) {
+				URL.revokeObjectURL(url);
+			}
+		};
 	}, [project.rooms]);
 
 	useEffect(() => {
@@ -222,7 +235,8 @@ function ProjectDetailPage() {
 					{
 						style: STYLE_OPTIONS[0]?.value ?? "modern",
 						prompt: "",
-						status: "idle",
+						status: room.generatedImageDataUrl ? "success" : "idle",
+						generatedImageDataUrl: room.generatedImageDataUrl ?? undefined,
 					},
 				]),
 			),
@@ -256,18 +270,52 @@ function ProjectDetailPage() {
 			return;
 		}
 
-		updateRenovation(roomId, { status: "submitting", message: undefined });
+		updateRenovation(roomId, {
+			status: "submitting",
+			message: "Analyzing room and generating photorealistic renovation...",
+		});
+
 		try {
-			// Placeholder: wire this up to a real generation endpoint.
-			await new Promise((resolve) => setTimeout(resolve, 800));
-			updateRenovation(roomId, {
-				status: "success",
-				message:
-					"Request queued. Connect this button to your generation service to render the renovation.",
+			// Call the server function to generate the image
+			const result = await (
+				generateRoomImage as unknown as (args: {
+					data: {
+						roomId: string;
+						projectId: string;
+						style: string;
+						prompt: string;
+					};
+				}) => Promise<{
+					success: boolean;
+					generatedImageDataUrl?: string;
+					error?: string;
+				}>
+			)({
+				data: {
+					roomId,
+					projectId: project.id,
+					style: current.style,
+					prompt: current.prompt,
+				},
 			});
+
+			if (result.success && result.generatedImageDataUrl) {
+				updateRenovation(roomId, {
+					status: "success",
+					message: "Renovation image generated successfully!",
+					generatedImageDataUrl: result.generatedImageDataUrl,
+				});
+				// Invalidate the route to refresh data
+				router.invalidate();
+			} else {
+				updateRenovation(roomId, {
+					status: "error",
+					message: result.error ?? "Image generation failed. Please try again.",
+				});
+			}
 		} catch (error) {
 			const message =
-				error instanceof Error ? error.message : "Unable to generate.";
+				error instanceof Error ? error.message : "Unable to generate image.";
 			updateRenovation(roomId, { status: "error", message });
 		}
 	};
@@ -315,7 +363,12 @@ function ProjectDetailPage() {
 									style: STYLE_OPTIONS[0]?.value ?? "modern",
 									prompt: "",
 									status: "idle" as RenovationStatus,
+									generatedImageDataUrl: undefined,
 								};
+
+								// Get the generated image from request state or from project data
+								const generatedImageUrl =
+									request.generatedImageDataUrl || room.generatedImageDataUrl;
 
 								const isPdf =
 									room.floorPlanMimeType?.toLowerCase().includes("pdf") ||
@@ -399,8 +452,8 @@ function ProjectDetailPage() {
 																) : (
 																	<div className="h-[340px] w-full rounded-lg border border-neutral-200 bg-neutral-100 p-4 dark:border-neutral-800 dark:bg-neutral-900">
 																		<p className="text-sm text-neutral-600 dark:text-neutral-300">
-																			Unable to preview this PDF floor plan
-																			in your browser. You can still download it
+																			Unable to preview this PDF floor plan in
+																			your browser. You can still download it
 																			below.
 																		</p>
 																	</div>
@@ -506,17 +559,56 @@ function ProjectDetailPage() {
 														>
 															{request.status === "submitting"
 																? "Generating..."
-																: "Generate photorealistic photo"}
+																: generatedImageUrl
+																	? "Regenerate photo"
+																	: "Generate photorealistic photo"}
 														</Button>
 														{request.message ? (
 															<p
-																className={`text-xs ${request.status === "error" ? "text-red-600 dark:text-red-400" : "text-neutral-600 dark:text-neutral-300"}`}
+																className={`text-xs ${request.status === "error" ? "text-red-600 dark:text-red-400" : request.status === "success" ? "text-emerald-600 dark:text-emerald-400" : "text-neutral-600 dark:text-neutral-300"}`}
 															>
 																{request.message}
 															</p>
 														) : null}
 													</div>
 												</div>
+
+												{/* Generated Renovation Image */}
+												{generatedImageUrl && (
+													<div className="space-y-3 rounded-lg border-2 border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/30">
+														<div className="flex items-center justify-between">
+															<div>
+																<p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+																	🎨 Generated Renovation
+																</p>
+																<p className="text-xs text-emerald-700 dark:text-emerald-300">
+																	AI-generated photorealistic visualization of
+																	your renovated room
+																</p>
+															</div>
+															<Badge
+																variant="secondary"
+																className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200"
+															>
+																AI Generated
+															</Badge>
+														</div>
+														<img
+															src={generatedImageUrl}
+															alt={`${room.name} renovation visualization`}
+															className="h-auto w-full rounded-lg border border-emerald-200 object-contain shadow-md dark:border-emerald-800"
+														/>
+														<div className="flex gap-2">
+															<a
+																className="text-sm text-emerald-600 underline dark:text-emerald-400"
+																href={generatedImageUrl}
+																download={`${room.name}-renovation.png`}
+															>
+																Download renovation image
+															</a>
+														</div>
+													</div>
+												)}
 											</div>
 										</AccordionContent>
 									</AccordionItem>

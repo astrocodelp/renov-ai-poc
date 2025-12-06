@@ -28,9 +28,12 @@ export type RoomMinAggregateOutputType = {
   id: string | null
   projectId: string | null
   name: string | null
+  description: string | null
   type: $Enums.RoomType | null
-  floorPlan: runtime.Bytes | null
-  image: runtime.Bytes | null
+  floorPlanFileId: string | null
+  imageFileId: string | null
+  generatedImageFileId: string | null
+  generatedVideoFileId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -39,9 +42,12 @@ export type RoomMaxAggregateOutputType = {
   id: string | null
   projectId: string | null
   name: string | null
+  description: string | null
   type: $Enums.RoomType | null
-  floorPlan: runtime.Bytes | null
-  image: runtime.Bytes | null
+  floorPlanFileId: string | null
+  imageFileId: string | null
+  generatedImageFileId: string | null
+  generatedVideoFileId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -50,9 +56,12 @@ export type RoomCountAggregateOutputType = {
   id: number
   projectId: number
   name: number
+  description: number
   type: number
-  floorPlan: number
-  image: number
+  floorPlanFileId: number
+  imageFileId: number
+  generatedImageFileId: number
+  generatedVideoFileId: number
   geometry: number
   createdAt: number
   updatedAt: number
@@ -64,9 +73,12 @@ export type RoomMinAggregateInputType = {
   id?: true
   projectId?: true
   name?: true
+  description?: true
   type?: true
-  floorPlan?: true
-  image?: true
+  floorPlanFileId?: true
+  imageFileId?: true
+  generatedImageFileId?: true
+  generatedVideoFileId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -75,9 +87,12 @@ export type RoomMaxAggregateInputType = {
   id?: true
   projectId?: true
   name?: true
+  description?: true
   type?: true
-  floorPlan?: true
-  image?: true
+  floorPlanFileId?: true
+  imageFileId?: true
+  generatedImageFileId?: true
+  generatedVideoFileId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -86,9 +101,12 @@ export type RoomCountAggregateInputType = {
   id?: true
   projectId?: true
   name?: true
+  description?: true
   type?: true
-  floorPlan?: true
-  image?: true
+  floorPlanFileId?: true
+  imageFileId?: true
+  generatedImageFileId?: true
+  generatedVideoFileId?: true
   geometry?: true
   createdAt?: true
   updatedAt?: true
@@ -171,9 +189,12 @@ export type RoomGroupByOutputType = {
   id: string
   projectId: string
   name: string
+  description: string | null
   type: $Enums.RoomType
-  floorPlan: runtime.Bytes
-  image: runtime.Bytes
+  floorPlanFileId: string
+  imageFileId: string | null
+  generatedImageFileId: string | null
+  generatedVideoFileId: string | null
   geometry: runtime.JsonValue | null
   createdAt: Date
   updatedAt: Date
@@ -204,51 +225,75 @@ export type RoomWhereInput = {
   id?: Prisma.StringFilter<"Room"> | string
   projectId?: Prisma.StringFilter<"Room"> | string
   name?: Prisma.StringFilter<"Room"> | string
+  description?: Prisma.StringNullableFilter<"Room"> | string | null
   type?: Prisma.EnumRoomTypeFilter<"Room"> | $Enums.RoomType
-  floorPlan?: Prisma.BytesFilter<"Room"> | runtime.Bytes
-  image?: Prisma.BytesFilter<"Room"> | runtime.Bytes
+  floorPlanFileId?: Prisma.StringFilter<"Room"> | string
+  imageFileId?: Prisma.StringNullableFilter<"Room"> | string | null
+  generatedImageFileId?: Prisma.StringNullableFilter<"Room"> | string | null
+  generatedVideoFileId?: Prisma.StringNullableFilter<"Room"> | string | null
   geometry?: Prisma.JsonNullableFilter<"Room">
   createdAt?: Prisma.DateTimeFilter<"Room"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Room"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
+  floorPlanFile?: Prisma.XOR<Prisma.FileScalarRelationFilter, Prisma.FileWhereInput>
+  imageFile?: Prisma.XOR<Prisma.FileNullableScalarRelationFilter, Prisma.FileWhereInput> | null
+  generatedImageFile?: Prisma.XOR<Prisma.FileNullableScalarRelationFilter, Prisma.FileWhereInput> | null
+  generatedVideoFile?: Prisma.XOR<Prisma.FileNullableScalarRelationFilter, Prisma.FileWhereInput> | null
 }
 
 export type RoomOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
-  floorPlan?: Prisma.SortOrder
-  image?: Prisma.SortOrder
+  floorPlanFileId?: Prisma.SortOrder
+  imageFileId?: Prisma.SortOrderInput | Prisma.SortOrder
+  generatedImageFileId?: Prisma.SortOrderInput | Prisma.SortOrder
+  generatedVideoFileId?: Prisma.SortOrderInput | Prisma.SortOrder
   geometry?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
+  floorPlanFile?: Prisma.FileOrderByWithRelationInput
+  imageFile?: Prisma.FileOrderByWithRelationInput
+  generatedImageFile?: Prisma.FileOrderByWithRelationInput
+  generatedVideoFile?: Prisma.FileOrderByWithRelationInput
 }
 
 export type RoomWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  floorPlanFileId?: string
+  imageFileId?: string
+  generatedImageFileId?: string
+  generatedVideoFileId?: string
   AND?: Prisma.RoomWhereInput | Prisma.RoomWhereInput[]
   OR?: Prisma.RoomWhereInput[]
   NOT?: Prisma.RoomWhereInput | Prisma.RoomWhereInput[]
   projectId?: Prisma.StringFilter<"Room"> | string
   name?: Prisma.StringFilter<"Room"> | string
+  description?: Prisma.StringNullableFilter<"Room"> | string | null
   type?: Prisma.EnumRoomTypeFilter<"Room"> | $Enums.RoomType
-  floorPlan?: Prisma.BytesFilter<"Room"> | runtime.Bytes
-  image?: Prisma.BytesFilter<"Room"> | runtime.Bytes
   geometry?: Prisma.JsonNullableFilter<"Room">
   createdAt?: Prisma.DateTimeFilter<"Room"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Room"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
-}, "id">
+  floorPlanFile?: Prisma.XOR<Prisma.FileScalarRelationFilter, Prisma.FileWhereInput>
+  imageFile?: Prisma.XOR<Prisma.FileNullableScalarRelationFilter, Prisma.FileWhereInput> | null
+  generatedImageFile?: Prisma.XOR<Prisma.FileNullableScalarRelationFilter, Prisma.FileWhereInput> | null
+  generatedVideoFile?: Prisma.XOR<Prisma.FileNullableScalarRelationFilter, Prisma.FileWhereInput> | null
+}, "id" | "floorPlanFileId" | "imageFileId" | "generatedImageFileId" | "generatedVideoFileId">
 
 export type RoomOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
-  floorPlan?: Prisma.SortOrder
-  image?: Prisma.SortOrder
+  floorPlanFileId?: Prisma.SortOrder
+  imageFileId?: Prisma.SortOrderInput | Prisma.SortOrder
+  generatedImageFileId?: Prisma.SortOrderInput | Prisma.SortOrder
+  generatedVideoFileId?: Prisma.SortOrderInput | Prisma.SortOrder
   geometry?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -264,9 +309,12 @@ export type RoomScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Room"> | string
   projectId?: Prisma.StringWithAggregatesFilter<"Room"> | string
   name?: Prisma.StringWithAggregatesFilter<"Room"> | string
+  description?: Prisma.StringNullableWithAggregatesFilter<"Room"> | string | null
   type?: Prisma.EnumRoomTypeWithAggregatesFilter<"Room"> | $Enums.RoomType
-  floorPlan?: Prisma.BytesWithAggregatesFilter<"Room"> | runtime.Bytes
-  image?: Prisma.BytesWithAggregatesFilter<"Room"> | runtime.Bytes
+  floorPlanFileId?: Prisma.StringWithAggregatesFilter<"Room"> | string
+  imageFileId?: Prisma.StringNullableWithAggregatesFilter<"Room"> | string | null
+  generatedImageFileId?: Prisma.StringNullableWithAggregatesFilter<"Room"> | string | null
+  generatedVideoFileId?: Prisma.StringNullableWithAggregatesFilter<"Room"> | string | null
   geometry?: Prisma.JsonNullableWithAggregatesFilter<"Room">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Room"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Room"> | Date | string
@@ -275,22 +323,28 @@ export type RoomScalarWhereWithAggregatesInput = {
 export type RoomCreateInput = {
   id?: string
   name: string
+  description?: string | null
   type: $Enums.RoomType
-  floorPlan: runtime.Bytes
-  image: runtime.Bytes
   geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutRoomsInput
+  floorPlanFile: Prisma.FileCreateNestedOneWithoutRoomFloorPlanInput
+  imageFile?: Prisma.FileCreateNestedOneWithoutRoomImageInput
+  generatedImageFile?: Prisma.FileCreateNestedOneWithoutRoomGeneratedImageInput
+  generatedVideoFile?: Prisma.FileCreateNestedOneWithoutRoomGeneratedVideoInput
 }
 
 export type RoomUncheckedCreateInput = {
   id?: string
   projectId: string
   name: string
+  description?: string | null
   type: $Enums.RoomType
-  floorPlan: runtime.Bytes
-  image: runtime.Bytes
+  floorPlanFileId: string
+  imageFileId?: string | null
+  generatedImageFileId?: string | null
+  generatedVideoFileId?: string | null
   geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -299,22 +353,28 @@ export type RoomUncheckedCreateInput = {
 export type RoomUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
-  floorPlan?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
-  image?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutRoomsNestedInput
+  floorPlanFile?: Prisma.FileUpdateOneRequiredWithoutRoomFloorPlanNestedInput
+  imageFile?: Prisma.FileUpdateOneWithoutRoomImageNestedInput
+  generatedImageFile?: Prisma.FileUpdateOneWithoutRoomGeneratedImageNestedInput
+  generatedVideoFile?: Prisma.FileUpdateOneWithoutRoomGeneratedVideoNestedInput
 }
 
 export type RoomUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
-  floorPlan?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
-  image?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  floorPlanFileId?: Prisma.StringFieldUpdateOperationsInput | string
+  imageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedImageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedVideoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -324,9 +384,12 @@ export type RoomCreateManyInput = {
   id?: string
   projectId: string
   name: string
+  description?: string | null
   type: $Enums.RoomType
-  floorPlan: runtime.Bytes
-  image: runtime.Bytes
+  floorPlanFileId: string
+  imageFileId?: string | null
+  generatedImageFileId?: string | null
+  generatedVideoFileId?: string | null
   geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -335,9 +398,8 @@ export type RoomCreateManyInput = {
 export type RoomUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
-  floorPlan?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
-  image?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -347,9 +409,12 @@ export type RoomUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
-  floorPlan?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
-  image?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  floorPlanFileId?: Prisma.StringFieldUpdateOperationsInput | string
+  imageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedImageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedVideoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -369,9 +434,12 @@ export type RoomCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  floorPlan?: Prisma.SortOrder
-  image?: Prisma.SortOrder
+  floorPlanFileId?: Prisma.SortOrder
+  imageFileId?: Prisma.SortOrder
+  generatedImageFileId?: Prisma.SortOrder
+  generatedVideoFileId?: Prisma.SortOrder
   geometry?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -381,9 +449,12 @@ export type RoomMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  floorPlan?: Prisma.SortOrder
-  image?: Prisma.SortOrder
+  floorPlanFileId?: Prisma.SortOrder
+  imageFileId?: Prisma.SortOrder
+  generatedImageFileId?: Prisma.SortOrder
+  generatedVideoFileId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -392,11 +463,19 @@ export type RoomMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  floorPlan?: Prisma.SortOrder
-  image?: Prisma.SortOrder
+  floorPlanFileId?: Prisma.SortOrder
+  imageFileId?: Prisma.SortOrder
+  generatedImageFileId?: Prisma.SortOrder
+  generatedVideoFileId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type RoomNullableScalarRelationFilter = {
+  is?: Prisma.RoomWhereInput | null
+  isNot?: Prisma.RoomWhereInput | null
 }
 
 export type RoomCreateNestedManyWithoutProjectInput = {
@@ -445,27 +524,157 @@ export type EnumRoomTypeFieldUpdateOperationsInput = {
   set?: $Enums.RoomType
 }
 
-export type BytesFieldUpdateOperationsInput = {
-  set?: runtime.Bytes
+export type RoomCreateNestedOneWithoutFloorPlanFileInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutFloorPlanFileInput, Prisma.RoomUncheckedCreateWithoutFloorPlanFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutFloorPlanFileInput
+  connect?: Prisma.RoomWhereUniqueInput
+}
+
+export type RoomCreateNestedOneWithoutImageFileInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutImageFileInput, Prisma.RoomUncheckedCreateWithoutImageFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutImageFileInput
+  connect?: Prisma.RoomWhereUniqueInput
+}
+
+export type RoomCreateNestedOneWithoutGeneratedImageFileInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutGeneratedImageFileInput, Prisma.RoomUncheckedCreateWithoutGeneratedImageFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutGeneratedImageFileInput
+  connect?: Prisma.RoomWhereUniqueInput
+}
+
+export type RoomCreateNestedOneWithoutGeneratedVideoFileInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutGeneratedVideoFileInput, Prisma.RoomUncheckedCreateWithoutGeneratedVideoFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutGeneratedVideoFileInput
+  connect?: Prisma.RoomWhereUniqueInput
+}
+
+export type RoomUncheckedCreateNestedOneWithoutFloorPlanFileInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutFloorPlanFileInput, Prisma.RoomUncheckedCreateWithoutFloorPlanFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutFloorPlanFileInput
+  connect?: Prisma.RoomWhereUniqueInput
+}
+
+export type RoomUncheckedCreateNestedOneWithoutImageFileInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutImageFileInput, Prisma.RoomUncheckedCreateWithoutImageFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutImageFileInput
+  connect?: Prisma.RoomWhereUniqueInput
+}
+
+export type RoomUncheckedCreateNestedOneWithoutGeneratedImageFileInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutGeneratedImageFileInput, Prisma.RoomUncheckedCreateWithoutGeneratedImageFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutGeneratedImageFileInput
+  connect?: Prisma.RoomWhereUniqueInput
+}
+
+export type RoomUncheckedCreateNestedOneWithoutGeneratedVideoFileInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutGeneratedVideoFileInput, Prisma.RoomUncheckedCreateWithoutGeneratedVideoFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutGeneratedVideoFileInput
+  connect?: Prisma.RoomWhereUniqueInput
+}
+
+export type RoomUpdateOneWithoutFloorPlanFileNestedInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutFloorPlanFileInput, Prisma.RoomUncheckedCreateWithoutFloorPlanFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutFloorPlanFileInput
+  upsert?: Prisma.RoomUpsertWithoutFloorPlanFileInput
+  disconnect?: Prisma.RoomWhereInput | boolean
+  delete?: Prisma.RoomWhereInput | boolean
+  connect?: Prisma.RoomWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RoomUpdateToOneWithWhereWithoutFloorPlanFileInput, Prisma.RoomUpdateWithoutFloorPlanFileInput>, Prisma.RoomUncheckedUpdateWithoutFloorPlanFileInput>
+}
+
+export type RoomUpdateOneWithoutImageFileNestedInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutImageFileInput, Prisma.RoomUncheckedCreateWithoutImageFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutImageFileInput
+  upsert?: Prisma.RoomUpsertWithoutImageFileInput
+  disconnect?: Prisma.RoomWhereInput | boolean
+  delete?: Prisma.RoomWhereInput | boolean
+  connect?: Prisma.RoomWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RoomUpdateToOneWithWhereWithoutImageFileInput, Prisma.RoomUpdateWithoutImageFileInput>, Prisma.RoomUncheckedUpdateWithoutImageFileInput>
+}
+
+export type RoomUpdateOneWithoutGeneratedImageFileNestedInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutGeneratedImageFileInput, Prisma.RoomUncheckedCreateWithoutGeneratedImageFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutGeneratedImageFileInput
+  upsert?: Prisma.RoomUpsertWithoutGeneratedImageFileInput
+  disconnect?: Prisma.RoomWhereInput | boolean
+  delete?: Prisma.RoomWhereInput | boolean
+  connect?: Prisma.RoomWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RoomUpdateToOneWithWhereWithoutGeneratedImageFileInput, Prisma.RoomUpdateWithoutGeneratedImageFileInput>, Prisma.RoomUncheckedUpdateWithoutGeneratedImageFileInput>
+}
+
+export type RoomUpdateOneWithoutGeneratedVideoFileNestedInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutGeneratedVideoFileInput, Prisma.RoomUncheckedCreateWithoutGeneratedVideoFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutGeneratedVideoFileInput
+  upsert?: Prisma.RoomUpsertWithoutGeneratedVideoFileInput
+  disconnect?: Prisma.RoomWhereInput | boolean
+  delete?: Prisma.RoomWhereInput | boolean
+  connect?: Prisma.RoomWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RoomUpdateToOneWithWhereWithoutGeneratedVideoFileInput, Prisma.RoomUpdateWithoutGeneratedVideoFileInput>, Prisma.RoomUncheckedUpdateWithoutGeneratedVideoFileInput>
+}
+
+export type RoomUncheckedUpdateOneWithoutFloorPlanFileNestedInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutFloorPlanFileInput, Prisma.RoomUncheckedCreateWithoutFloorPlanFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutFloorPlanFileInput
+  upsert?: Prisma.RoomUpsertWithoutFloorPlanFileInput
+  disconnect?: Prisma.RoomWhereInput | boolean
+  delete?: Prisma.RoomWhereInput | boolean
+  connect?: Prisma.RoomWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RoomUpdateToOneWithWhereWithoutFloorPlanFileInput, Prisma.RoomUpdateWithoutFloorPlanFileInput>, Prisma.RoomUncheckedUpdateWithoutFloorPlanFileInput>
+}
+
+export type RoomUncheckedUpdateOneWithoutImageFileNestedInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutImageFileInput, Prisma.RoomUncheckedCreateWithoutImageFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutImageFileInput
+  upsert?: Prisma.RoomUpsertWithoutImageFileInput
+  disconnect?: Prisma.RoomWhereInput | boolean
+  delete?: Prisma.RoomWhereInput | boolean
+  connect?: Prisma.RoomWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RoomUpdateToOneWithWhereWithoutImageFileInput, Prisma.RoomUpdateWithoutImageFileInput>, Prisma.RoomUncheckedUpdateWithoutImageFileInput>
+}
+
+export type RoomUncheckedUpdateOneWithoutGeneratedImageFileNestedInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutGeneratedImageFileInput, Prisma.RoomUncheckedCreateWithoutGeneratedImageFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutGeneratedImageFileInput
+  upsert?: Prisma.RoomUpsertWithoutGeneratedImageFileInput
+  disconnect?: Prisma.RoomWhereInput | boolean
+  delete?: Prisma.RoomWhereInput | boolean
+  connect?: Prisma.RoomWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RoomUpdateToOneWithWhereWithoutGeneratedImageFileInput, Prisma.RoomUpdateWithoutGeneratedImageFileInput>, Prisma.RoomUncheckedUpdateWithoutGeneratedImageFileInput>
+}
+
+export type RoomUncheckedUpdateOneWithoutGeneratedVideoFileNestedInput = {
+  create?: Prisma.XOR<Prisma.RoomCreateWithoutGeneratedVideoFileInput, Prisma.RoomUncheckedCreateWithoutGeneratedVideoFileInput>
+  connectOrCreate?: Prisma.RoomCreateOrConnectWithoutGeneratedVideoFileInput
+  upsert?: Prisma.RoomUpsertWithoutGeneratedVideoFileInput
+  disconnect?: Prisma.RoomWhereInput | boolean
+  delete?: Prisma.RoomWhereInput | boolean
+  connect?: Prisma.RoomWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RoomUpdateToOneWithWhereWithoutGeneratedVideoFileInput, Prisma.RoomUpdateWithoutGeneratedVideoFileInput>, Prisma.RoomUncheckedUpdateWithoutGeneratedVideoFileInput>
 }
 
 export type RoomCreateWithoutProjectInput = {
   id?: string
   name: string
+  description?: string | null
   type: $Enums.RoomType
-  floorPlan: runtime.Bytes
-  image: runtime.Bytes
   geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  floorPlanFile: Prisma.FileCreateNestedOneWithoutRoomFloorPlanInput
+  imageFile?: Prisma.FileCreateNestedOneWithoutRoomImageInput
+  generatedImageFile?: Prisma.FileCreateNestedOneWithoutRoomGeneratedImageInput
+  generatedVideoFile?: Prisma.FileCreateNestedOneWithoutRoomGeneratedVideoInput
 }
 
 export type RoomUncheckedCreateWithoutProjectInput = {
   id?: string
   name: string
+  description?: string | null
   type: $Enums.RoomType
-  floorPlan: runtime.Bytes
-  image: runtime.Bytes
+  floorPlanFileId: string
+  imageFileId?: string | null
+  generatedImageFileId?: string | null
+  generatedVideoFileId?: string | null
   geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -504,20 +713,314 @@ export type RoomScalarWhereInput = {
   id?: Prisma.StringFilter<"Room"> | string
   projectId?: Prisma.StringFilter<"Room"> | string
   name?: Prisma.StringFilter<"Room"> | string
+  description?: Prisma.StringNullableFilter<"Room"> | string | null
   type?: Prisma.EnumRoomTypeFilter<"Room"> | $Enums.RoomType
-  floorPlan?: Prisma.BytesFilter<"Room"> | runtime.Bytes
-  image?: Prisma.BytesFilter<"Room"> | runtime.Bytes
+  floorPlanFileId?: Prisma.StringFilter<"Room"> | string
+  imageFileId?: Prisma.StringNullableFilter<"Room"> | string | null
+  generatedImageFileId?: Prisma.StringNullableFilter<"Room"> | string | null
+  generatedVideoFileId?: Prisma.StringNullableFilter<"Room"> | string | null
   geometry?: Prisma.JsonNullableFilter<"Room">
   createdAt?: Prisma.DateTimeFilter<"Room"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Room"> | Date | string
 }
 
+export type RoomCreateWithoutFloorPlanFileInput = {
+  id?: string
+  name: string
+  description?: string | null
+  type: $Enums.RoomType
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  project: Prisma.ProjectCreateNestedOneWithoutRoomsInput
+  imageFile?: Prisma.FileCreateNestedOneWithoutRoomImageInput
+  generatedImageFile?: Prisma.FileCreateNestedOneWithoutRoomGeneratedImageInput
+  generatedVideoFile?: Prisma.FileCreateNestedOneWithoutRoomGeneratedVideoInput
+}
+
+export type RoomUncheckedCreateWithoutFloorPlanFileInput = {
+  id?: string
+  projectId: string
+  name: string
+  description?: string | null
+  type: $Enums.RoomType
+  imageFileId?: string | null
+  generatedImageFileId?: string | null
+  generatedVideoFileId?: string | null
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type RoomCreateOrConnectWithoutFloorPlanFileInput = {
+  where: Prisma.RoomWhereUniqueInput
+  create: Prisma.XOR<Prisma.RoomCreateWithoutFloorPlanFileInput, Prisma.RoomUncheckedCreateWithoutFloorPlanFileInput>
+}
+
+export type RoomCreateWithoutImageFileInput = {
+  id?: string
+  name: string
+  description?: string | null
+  type: $Enums.RoomType
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  project: Prisma.ProjectCreateNestedOneWithoutRoomsInput
+  floorPlanFile: Prisma.FileCreateNestedOneWithoutRoomFloorPlanInput
+  generatedImageFile?: Prisma.FileCreateNestedOneWithoutRoomGeneratedImageInput
+  generatedVideoFile?: Prisma.FileCreateNestedOneWithoutRoomGeneratedVideoInput
+}
+
+export type RoomUncheckedCreateWithoutImageFileInput = {
+  id?: string
+  projectId: string
+  name: string
+  description?: string | null
+  type: $Enums.RoomType
+  floorPlanFileId: string
+  generatedImageFileId?: string | null
+  generatedVideoFileId?: string | null
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type RoomCreateOrConnectWithoutImageFileInput = {
+  where: Prisma.RoomWhereUniqueInput
+  create: Prisma.XOR<Prisma.RoomCreateWithoutImageFileInput, Prisma.RoomUncheckedCreateWithoutImageFileInput>
+}
+
+export type RoomCreateWithoutGeneratedImageFileInput = {
+  id?: string
+  name: string
+  description?: string | null
+  type: $Enums.RoomType
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  project: Prisma.ProjectCreateNestedOneWithoutRoomsInput
+  floorPlanFile: Prisma.FileCreateNestedOneWithoutRoomFloorPlanInput
+  imageFile?: Prisma.FileCreateNestedOneWithoutRoomImageInput
+  generatedVideoFile?: Prisma.FileCreateNestedOneWithoutRoomGeneratedVideoInput
+}
+
+export type RoomUncheckedCreateWithoutGeneratedImageFileInput = {
+  id?: string
+  projectId: string
+  name: string
+  description?: string | null
+  type: $Enums.RoomType
+  floorPlanFileId: string
+  imageFileId?: string | null
+  generatedVideoFileId?: string | null
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type RoomCreateOrConnectWithoutGeneratedImageFileInput = {
+  where: Prisma.RoomWhereUniqueInput
+  create: Prisma.XOR<Prisma.RoomCreateWithoutGeneratedImageFileInput, Prisma.RoomUncheckedCreateWithoutGeneratedImageFileInput>
+}
+
+export type RoomCreateWithoutGeneratedVideoFileInput = {
+  id?: string
+  name: string
+  description?: string | null
+  type: $Enums.RoomType
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  project: Prisma.ProjectCreateNestedOneWithoutRoomsInput
+  floorPlanFile: Prisma.FileCreateNestedOneWithoutRoomFloorPlanInput
+  imageFile?: Prisma.FileCreateNestedOneWithoutRoomImageInput
+  generatedImageFile?: Prisma.FileCreateNestedOneWithoutRoomGeneratedImageInput
+}
+
+export type RoomUncheckedCreateWithoutGeneratedVideoFileInput = {
+  id?: string
+  projectId: string
+  name: string
+  description?: string | null
+  type: $Enums.RoomType
+  floorPlanFileId: string
+  imageFileId?: string | null
+  generatedImageFileId?: string | null
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type RoomCreateOrConnectWithoutGeneratedVideoFileInput = {
+  where: Prisma.RoomWhereUniqueInput
+  create: Prisma.XOR<Prisma.RoomCreateWithoutGeneratedVideoFileInput, Prisma.RoomUncheckedCreateWithoutGeneratedVideoFileInput>
+}
+
+export type RoomUpsertWithoutFloorPlanFileInput = {
+  update: Prisma.XOR<Prisma.RoomUpdateWithoutFloorPlanFileInput, Prisma.RoomUncheckedUpdateWithoutFloorPlanFileInput>
+  create: Prisma.XOR<Prisma.RoomCreateWithoutFloorPlanFileInput, Prisma.RoomUncheckedCreateWithoutFloorPlanFileInput>
+  where?: Prisma.RoomWhereInput
+}
+
+export type RoomUpdateToOneWithWhereWithoutFloorPlanFileInput = {
+  where?: Prisma.RoomWhereInput
+  data: Prisma.XOR<Prisma.RoomUpdateWithoutFloorPlanFileInput, Prisma.RoomUncheckedUpdateWithoutFloorPlanFileInput>
+}
+
+export type RoomUpdateWithoutFloorPlanFileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutRoomsNestedInput
+  imageFile?: Prisma.FileUpdateOneWithoutRoomImageNestedInput
+  generatedImageFile?: Prisma.FileUpdateOneWithoutRoomGeneratedImageNestedInput
+  generatedVideoFile?: Prisma.FileUpdateOneWithoutRoomGeneratedVideoNestedInput
+}
+
+export type RoomUncheckedUpdateWithoutFloorPlanFileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
+  imageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedImageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedVideoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type RoomUpsertWithoutImageFileInput = {
+  update: Prisma.XOR<Prisma.RoomUpdateWithoutImageFileInput, Prisma.RoomUncheckedUpdateWithoutImageFileInput>
+  create: Prisma.XOR<Prisma.RoomCreateWithoutImageFileInput, Prisma.RoomUncheckedCreateWithoutImageFileInput>
+  where?: Prisma.RoomWhereInput
+}
+
+export type RoomUpdateToOneWithWhereWithoutImageFileInput = {
+  where?: Prisma.RoomWhereInput
+  data: Prisma.XOR<Prisma.RoomUpdateWithoutImageFileInput, Prisma.RoomUncheckedUpdateWithoutImageFileInput>
+}
+
+export type RoomUpdateWithoutImageFileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutRoomsNestedInput
+  floorPlanFile?: Prisma.FileUpdateOneRequiredWithoutRoomFloorPlanNestedInput
+  generatedImageFile?: Prisma.FileUpdateOneWithoutRoomGeneratedImageNestedInput
+  generatedVideoFile?: Prisma.FileUpdateOneWithoutRoomGeneratedVideoNestedInput
+}
+
+export type RoomUncheckedUpdateWithoutImageFileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
+  floorPlanFileId?: Prisma.StringFieldUpdateOperationsInput | string
+  generatedImageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedVideoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type RoomUpsertWithoutGeneratedImageFileInput = {
+  update: Prisma.XOR<Prisma.RoomUpdateWithoutGeneratedImageFileInput, Prisma.RoomUncheckedUpdateWithoutGeneratedImageFileInput>
+  create: Prisma.XOR<Prisma.RoomCreateWithoutGeneratedImageFileInput, Prisma.RoomUncheckedCreateWithoutGeneratedImageFileInput>
+  where?: Prisma.RoomWhereInput
+}
+
+export type RoomUpdateToOneWithWhereWithoutGeneratedImageFileInput = {
+  where?: Prisma.RoomWhereInput
+  data: Prisma.XOR<Prisma.RoomUpdateWithoutGeneratedImageFileInput, Prisma.RoomUncheckedUpdateWithoutGeneratedImageFileInput>
+}
+
+export type RoomUpdateWithoutGeneratedImageFileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutRoomsNestedInput
+  floorPlanFile?: Prisma.FileUpdateOneRequiredWithoutRoomFloorPlanNestedInput
+  imageFile?: Prisma.FileUpdateOneWithoutRoomImageNestedInput
+  generatedVideoFile?: Prisma.FileUpdateOneWithoutRoomGeneratedVideoNestedInput
+}
+
+export type RoomUncheckedUpdateWithoutGeneratedImageFileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
+  floorPlanFileId?: Prisma.StringFieldUpdateOperationsInput | string
+  imageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedVideoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type RoomUpsertWithoutGeneratedVideoFileInput = {
+  update: Prisma.XOR<Prisma.RoomUpdateWithoutGeneratedVideoFileInput, Prisma.RoomUncheckedUpdateWithoutGeneratedVideoFileInput>
+  create: Prisma.XOR<Prisma.RoomCreateWithoutGeneratedVideoFileInput, Prisma.RoomUncheckedCreateWithoutGeneratedVideoFileInput>
+  where?: Prisma.RoomWhereInput
+}
+
+export type RoomUpdateToOneWithWhereWithoutGeneratedVideoFileInput = {
+  where?: Prisma.RoomWhereInput
+  data: Prisma.XOR<Prisma.RoomUpdateWithoutGeneratedVideoFileInput, Prisma.RoomUncheckedUpdateWithoutGeneratedVideoFileInput>
+}
+
+export type RoomUpdateWithoutGeneratedVideoFileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutRoomsNestedInput
+  floorPlanFile?: Prisma.FileUpdateOneRequiredWithoutRoomFloorPlanNestedInput
+  imageFile?: Prisma.FileUpdateOneWithoutRoomImageNestedInput
+  generatedImageFile?: Prisma.FileUpdateOneWithoutRoomGeneratedImageNestedInput
+}
+
+export type RoomUncheckedUpdateWithoutGeneratedVideoFileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
+  floorPlanFileId?: Prisma.StringFieldUpdateOperationsInput | string
+  imageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedImageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type RoomCreateManyProjectInput = {
   id?: string
   name: string
+  description?: string | null
   type: $Enums.RoomType
-  floorPlan: runtime.Bytes
-  image: runtime.Bytes
+  floorPlanFileId: string
+  imageFileId?: string | null
+  generatedImageFileId?: string | null
+  generatedVideoFileId?: string | null
   geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -526,20 +1029,26 @@ export type RoomCreateManyProjectInput = {
 export type RoomUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
-  floorPlan?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
-  image?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  floorPlanFile?: Prisma.FileUpdateOneRequiredWithoutRoomFloorPlanNestedInput
+  imageFile?: Prisma.FileUpdateOneWithoutRoomImageNestedInput
+  generatedImageFile?: Prisma.FileUpdateOneWithoutRoomGeneratedImageNestedInput
+  generatedVideoFile?: Prisma.FileUpdateOneWithoutRoomGeneratedVideoNestedInput
 }
 
 export type RoomUncheckedUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
-  floorPlan?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
-  image?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  floorPlanFileId?: Prisma.StringFieldUpdateOperationsInput | string
+  imageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedImageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedVideoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -548,9 +1057,12 @@ export type RoomUncheckedUpdateWithoutProjectInput = {
 export type RoomUncheckedUpdateManyWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumRoomTypeFieldUpdateOperationsInput | $Enums.RoomType
-  floorPlan?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
-  image?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  floorPlanFileId?: Prisma.StringFieldUpdateOperationsInput | string
+  imageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedImageFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generatedVideoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -562,76 +1074,119 @@ export type RoomSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   projectId?: boolean
   name?: boolean
+  description?: boolean
   type?: boolean
-  floorPlan?: boolean
-  image?: boolean
+  floorPlanFileId?: boolean
+  imageFileId?: boolean
+  generatedImageFileId?: boolean
+  generatedVideoFileId?: boolean
   geometry?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  floorPlanFile?: boolean | Prisma.FileDefaultArgs<ExtArgs>
+  imageFile?: boolean | Prisma.Room$imageFileArgs<ExtArgs>
+  generatedImageFile?: boolean | Prisma.Room$generatedImageFileArgs<ExtArgs>
+  generatedVideoFile?: boolean | Prisma.Room$generatedVideoFileArgs<ExtArgs>
 }, ExtArgs["result"]["room"]>
 
 export type RoomSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   projectId?: boolean
   name?: boolean
+  description?: boolean
   type?: boolean
-  floorPlan?: boolean
-  image?: boolean
+  floorPlanFileId?: boolean
+  imageFileId?: boolean
+  generatedImageFileId?: boolean
+  generatedVideoFileId?: boolean
   geometry?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  floorPlanFile?: boolean | Prisma.FileDefaultArgs<ExtArgs>
+  imageFile?: boolean | Prisma.Room$imageFileArgs<ExtArgs>
+  generatedImageFile?: boolean | Prisma.Room$generatedImageFileArgs<ExtArgs>
+  generatedVideoFile?: boolean | Prisma.Room$generatedVideoFileArgs<ExtArgs>
 }, ExtArgs["result"]["room"]>
 
 export type RoomSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   projectId?: boolean
   name?: boolean
+  description?: boolean
   type?: boolean
-  floorPlan?: boolean
-  image?: boolean
+  floorPlanFileId?: boolean
+  imageFileId?: boolean
+  generatedImageFileId?: boolean
+  generatedVideoFileId?: boolean
   geometry?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  floorPlanFile?: boolean | Prisma.FileDefaultArgs<ExtArgs>
+  imageFile?: boolean | Prisma.Room$imageFileArgs<ExtArgs>
+  generatedImageFile?: boolean | Prisma.Room$generatedImageFileArgs<ExtArgs>
+  generatedVideoFile?: boolean | Prisma.Room$generatedVideoFileArgs<ExtArgs>
 }, ExtArgs["result"]["room"]>
 
 export type RoomSelectScalar = {
   id?: boolean
   projectId?: boolean
   name?: boolean
+  description?: boolean
   type?: boolean
-  floorPlan?: boolean
-  image?: boolean
+  floorPlanFileId?: boolean
+  imageFileId?: boolean
+  generatedImageFileId?: boolean
+  generatedVideoFileId?: boolean
   geometry?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type RoomOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "name" | "type" | "floorPlan" | "image" | "geometry" | "createdAt" | "updatedAt", ExtArgs["result"]["room"]>
+export type RoomOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "name" | "description" | "type" | "floorPlanFileId" | "imageFileId" | "generatedImageFileId" | "generatedVideoFileId" | "geometry" | "createdAt" | "updatedAt", ExtArgs["result"]["room"]>
 export type RoomInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  floorPlanFile?: boolean | Prisma.FileDefaultArgs<ExtArgs>
+  imageFile?: boolean | Prisma.Room$imageFileArgs<ExtArgs>
+  generatedImageFile?: boolean | Prisma.Room$generatedImageFileArgs<ExtArgs>
+  generatedVideoFile?: boolean | Prisma.Room$generatedVideoFileArgs<ExtArgs>
 }
 export type RoomIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  floorPlanFile?: boolean | Prisma.FileDefaultArgs<ExtArgs>
+  imageFile?: boolean | Prisma.Room$imageFileArgs<ExtArgs>
+  generatedImageFile?: boolean | Prisma.Room$generatedImageFileArgs<ExtArgs>
+  generatedVideoFile?: boolean | Prisma.Room$generatedVideoFileArgs<ExtArgs>
 }
 export type RoomIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  floorPlanFile?: boolean | Prisma.FileDefaultArgs<ExtArgs>
+  imageFile?: boolean | Prisma.Room$imageFileArgs<ExtArgs>
+  generatedImageFile?: boolean | Prisma.Room$generatedImageFileArgs<ExtArgs>
+  generatedVideoFile?: boolean | Prisma.Room$generatedVideoFileArgs<ExtArgs>
 }
 
 export type $RoomPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Room"
   objects: {
     project: Prisma.$ProjectPayload<ExtArgs>
+    floorPlanFile: Prisma.$FilePayload<ExtArgs>
+    imageFile: Prisma.$FilePayload<ExtArgs> | null
+    generatedImageFile: Prisma.$FilePayload<ExtArgs> | null
+    generatedVideoFile: Prisma.$FilePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     projectId: string
     name: string
+    description: string | null
     type: $Enums.RoomType
-    floorPlan: runtime.Bytes
-    image: runtime.Bytes
+    floorPlanFileId: string
+    imageFileId: string | null
+    generatedImageFileId: string | null
+    generatedVideoFileId: string | null
     geometry: runtime.JsonValue | null
     createdAt: Date
     updatedAt: Date
@@ -1030,6 +1585,10 @@ readonly fields: RoomFieldRefs;
 export interface Prisma__RoomClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   project<T extends Prisma.ProjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectDefaultArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  floorPlanFile<T extends Prisma.FileDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FileDefaultArgs<ExtArgs>>): Prisma.Prisma__FileClient<runtime.Types.Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  imageFile<T extends Prisma.Room$imageFileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Room$imageFileArgs<ExtArgs>>): Prisma.Prisma__FileClient<runtime.Types.Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  generatedImageFile<T extends Prisma.Room$generatedImageFileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Room$generatedImageFileArgs<ExtArgs>>): Prisma.Prisma__FileClient<runtime.Types.Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  generatedVideoFile<T extends Prisma.Room$generatedVideoFileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Room$generatedVideoFileArgs<ExtArgs>>): Prisma.Prisma__FileClient<runtime.Types.Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1062,9 +1621,12 @@ export interface RoomFieldRefs {
   readonly id: Prisma.FieldRef<"Room", 'String'>
   readonly projectId: Prisma.FieldRef<"Room", 'String'>
   readonly name: Prisma.FieldRef<"Room", 'String'>
+  readonly description: Prisma.FieldRef<"Room", 'String'>
   readonly type: Prisma.FieldRef<"Room", 'RoomType'>
-  readonly floorPlan: Prisma.FieldRef<"Room", 'Bytes'>
-  readonly image: Prisma.FieldRef<"Room", 'Bytes'>
+  readonly floorPlanFileId: Prisma.FieldRef<"Room", 'String'>
+  readonly imageFileId: Prisma.FieldRef<"Room", 'String'>
+  readonly generatedImageFileId: Prisma.FieldRef<"Room", 'String'>
+  readonly generatedVideoFileId: Prisma.FieldRef<"Room", 'String'>
   readonly geometry: Prisma.FieldRef<"Room", 'Json'>
   readonly createdAt: Prisma.FieldRef<"Room", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Room", 'DateTime'>
@@ -1461,6 +2023,63 @@ export type RoomDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Rooms to delete.
    */
   limit?: number
+}
+
+/**
+ * Room.imageFile
+ */
+export type Room$imageFileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the File
+   */
+  select?: Prisma.FileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the File
+   */
+  omit?: Prisma.FileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FileInclude<ExtArgs> | null
+  where?: Prisma.FileWhereInput
+}
+
+/**
+ * Room.generatedImageFile
+ */
+export type Room$generatedImageFileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the File
+   */
+  select?: Prisma.FileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the File
+   */
+  omit?: Prisma.FileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FileInclude<ExtArgs> | null
+  where?: Prisma.FileWhereInput
+}
+
+/**
+ * Room.generatedVideoFile
+ */
+export type Room$generatedVideoFileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the File
+   */
+  select?: Prisma.FileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the File
+   */
+  omit?: Prisma.FileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FileInclude<ExtArgs> | null
+  where?: Prisma.FileWhereInput
 }
 
 /**

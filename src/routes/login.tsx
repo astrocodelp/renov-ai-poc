@@ -53,7 +53,7 @@ export const Route = createFileRoute("/login")({
 	beforeLoad: async ({ context }) => {
 		// On the server, redirect authenticated users away from the login page
 		if (typeof window === "undefined") {
-			const { auth } = await import("@/lib/auth");
+			const { auth } = await import("@/lib/auth.server");
 			const request = (context as { request?: Request } | undefined)?.request;
 			const session = await auth.api.getSession({
 				headers: request?.headers ?? new Headers(),
@@ -161,7 +161,7 @@ function LoginRouteComponent() {
 								<LogIn className="h-5 w-5" />
 							</div>
 							<h1 className="text-3xl font-bold leading-tight font-display">
-								Sign in to Rinnov.ai
+								Sign in to Rennov.ai
 							</h1>
 						</div>
 						<div className="h-px w-16 bg-primary/60" />

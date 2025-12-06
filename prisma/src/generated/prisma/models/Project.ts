@@ -27,7 +27,9 @@ export type AggregateProject = {
 export type ProjectMinAggregateOutputType = {
   id: string | null
   name: string | null
+  description: string | null
   ownerId: string | null
+  defaultFloorPlanFileId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -35,7 +37,9 @@ export type ProjectMinAggregateOutputType = {
 export type ProjectMaxAggregateOutputType = {
   id: string | null
   name: string | null
+  description: string | null
   ownerId: string | null
+  defaultFloorPlanFileId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -43,7 +47,9 @@ export type ProjectMaxAggregateOutputType = {
 export type ProjectCountAggregateOutputType = {
   id: number
   name: number
+  description: number
   ownerId: number
+  defaultFloorPlanFileId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -53,7 +59,9 @@ export type ProjectCountAggregateOutputType = {
 export type ProjectMinAggregateInputType = {
   id?: true
   name?: true
+  description?: true
   ownerId?: true
+  defaultFloorPlanFileId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -61,7 +69,9 @@ export type ProjectMinAggregateInputType = {
 export type ProjectMaxAggregateInputType = {
   id?: true
   name?: true
+  description?: true
   ownerId?: true
+  defaultFloorPlanFileId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -69,7 +79,9 @@ export type ProjectMaxAggregateInputType = {
 export type ProjectCountAggregateInputType = {
   id?: true
   name?: true
+  description?: true
   ownerId?: true
+  defaultFloorPlanFileId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -150,7 +162,9 @@ export type ProjectGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type ProjectGroupByOutputType = {
   id: string
   name: string
+  description: string | null
   ownerId: string
+  defaultFloorPlanFileId: string | null
   createdAt: Date
   updatedAt: Date
   _count: ProjectCountAggregateOutputType | null
@@ -179,40 +193,51 @@ export type ProjectWhereInput = {
   NOT?: Prisma.ProjectWhereInput | Prisma.ProjectWhereInput[]
   id?: Prisma.StringFilter<"Project"> | string
   name?: Prisma.StringFilter<"Project"> | string
+  description?: Prisma.StringNullableFilter<"Project"> | string | null
   ownerId?: Prisma.StringFilter<"Project"> | string
+  defaultFloorPlanFileId?: Prisma.StringNullableFilter<"Project"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  defaultFloorPlanFile?: Prisma.XOR<Prisma.FileNullableScalarRelationFilter, Prisma.FileWhereInput> | null
   rooms?: Prisma.RoomListRelationFilter
 }
 
 export type ProjectOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+  defaultFloorPlanFileId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   owner?: Prisma.UserOrderByWithRelationInput
+  defaultFloorPlanFile?: Prisma.FileOrderByWithRelationInput
   rooms?: Prisma.RoomOrderByRelationAggregateInput
 }
 
 export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  defaultFloorPlanFileId?: string
   AND?: Prisma.ProjectWhereInput | Prisma.ProjectWhereInput[]
   OR?: Prisma.ProjectWhereInput[]
   NOT?: Prisma.ProjectWhereInput | Prisma.ProjectWhereInput[]
   name?: Prisma.StringFilter<"Project"> | string
+  description?: Prisma.StringNullableFilter<"Project"> | string | null
   ownerId?: Prisma.StringFilter<"Project"> | string
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  defaultFloorPlanFile?: Prisma.XOR<Prisma.FileNullableScalarRelationFilter, Prisma.FileWhereInput> | null
   rooms?: Prisma.RoomListRelationFilter
-}, "id">
+}, "id" | "defaultFloorPlanFileId">
 
 export type ProjectOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+  defaultFloorPlanFileId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProjectCountOrderByAggregateInput
@@ -226,7 +251,9 @@ export type ProjectScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ProjectScalarWhereWithAggregatesInput | Prisma.ProjectScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Project"> | string
   name?: Prisma.StringWithAggregatesFilter<"Project"> | string
+  description?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   ownerId?: Prisma.StringWithAggregatesFilter<"Project"> | string
+  defaultFloorPlanFileId?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
 }
@@ -234,16 +261,20 @@ export type ProjectScalarWhereWithAggregatesInput = {
 export type ProjectCreateInput = {
   id?: string
   name: string
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  defaultFloorPlanFile?: Prisma.FileCreateNestedOneWithoutProjectDefaultFloorPlanInput
   rooms?: Prisma.RoomCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateInput = {
   id?: string
   name: string
+  description?: string | null
   ownerId: string
+  defaultFloorPlanFileId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutProjectInput
@@ -252,16 +283,20 @@ export type ProjectUncheckedCreateInput = {
 export type ProjectUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  defaultFloorPlanFile?: Prisma.FileUpdateOneWithoutProjectDefaultFloorPlanNestedInput
   rooms?: Prisma.RoomUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultFloorPlanFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rooms?: Prisma.RoomUncheckedUpdateManyWithoutProjectNestedInput
@@ -270,7 +305,9 @@ export type ProjectUncheckedUpdateInput = {
 export type ProjectCreateManyInput = {
   id?: string
   name: string
+  description?: string | null
   ownerId: string
+  defaultFloorPlanFileId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -278,6 +315,7 @@ export type ProjectCreateManyInput = {
 export type ProjectUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -285,7 +323,9 @@ export type ProjectUpdateManyMutationInput = {
 export type ProjectUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultFloorPlanFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -303,7 +343,9 @@ export type ProjectOrderByRelationAggregateInput = {
 export type ProjectCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+  defaultFloorPlanFileId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -311,7 +353,9 @@ export type ProjectCountOrderByAggregateInput = {
 export type ProjectMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+  defaultFloorPlanFileId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -319,7 +363,9 @@ export type ProjectMaxOrderByAggregateInput = {
 export type ProjectMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+  defaultFloorPlanFileId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -327,6 +373,11 @@ export type ProjectMinOrderByAggregateInput = {
 export type ProjectScalarRelationFilter = {
   is?: Prisma.ProjectWhereInput
   isNot?: Prisma.ProjectWhereInput
+}
+
+export type ProjectNullableScalarRelationFilter = {
+  is?: Prisma.ProjectWhereInput | null
+  isNot?: Prisma.ProjectWhereInput | null
 }
 
 export type ProjectCreateNestedManyWithoutOwnerInput = {
@@ -385,17 +436,53 @@ export type ProjectUpdateOneRequiredWithoutRoomsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutRoomsInput, Prisma.ProjectUpdateWithoutRoomsInput>, Prisma.ProjectUncheckedUpdateWithoutRoomsInput>
 }
 
+export type ProjectCreateNestedOneWithoutDefaultFloorPlanFileInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutDefaultFloorPlanFileInput, Prisma.ProjectUncheckedCreateWithoutDefaultFloorPlanFileInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutDefaultFloorPlanFileInput
+  connect?: Prisma.ProjectWhereUniqueInput
+}
+
+export type ProjectUncheckedCreateNestedOneWithoutDefaultFloorPlanFileInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutDefaultFloorPlanFileInput, Prisma.ProjectUncheckedCreateWithoutDefaultFloorPlanFileInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutDefaultFloorPlanFileInput
+  connect?: Prisma.ProjectWhereUniqueInput
+}
+
+export type ProjectUpdateOneWithoutDefaultFloorPlanFileNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutDefaultFloorPlanFileInput, Prisma.ProjectUncheckedCreateWithoutDefaultFloorPlanFileInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutDefaultFloorPlanFileInput
+  upsert?: Prisma.ProjectUpsertWithoutDefaultFloorPlanFileInput
+  disconnect?: Prisma.ProjectWhereInput | boolean
+  delete?: Prisma.ProjectWhereInput | boolean
+  connect?: Prisma.ProjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutDefaultFloorPlanFileInput, Prisma.ProjectUpdateWithoutDefaultFloorPlanFileInput>, Prisma.ProjectUncheckedUpdateWithoutDefaultFloorPlanFileInput>
+}
+
+export type ProjectUncheckedUpdateOneWithoutDefaultFloorPlanFileNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutDefaultFloorPlanFileInput, Prisma.ProjectUncheckedCreateWithoutDefaultFloorPlanFileInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutDefaultFloorPlanFileInput
+  upsert?: Prisma.ProjectUpsertWithoutDefaultFloorPlanFileInput
+  disconnect?: Prisma.ProjectWhereInput | boolean
+  delete?: Prisma.ProjectWhereInput | boolean
+  connect?: Prisma.ProjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutDefaultFloorPlanFileInput, Prisma.ProjectUpdateWithoutDefaultFloorPlanFileInput>, Prisma.ProjectUncheckedUpdateWithoutDefaultFloorPlanFileInput>
+}
+
 export type ProjectCreateWithoutOwnerInput = {
   id?: string
   name: string
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  defaultFloorPlanFile?: Prisma.FileCreateNestedOneWithoutProjectDefaultFloorPlanInput
   rooms?: Prisma.RoomCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutOwnerInput = {
   id?: string
   name: string
+  description?: string | null
+  defaultFloorPlanFileId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutProjectInput
@@ -433,7 +520,9 @@ export type ProjectScalarWhereInput = {
   NOT?: Prisma.ProjectScalarWhereInput | Prisma.ProjectScalarWhereInput[]
   id?: Prisma.StringFilter<"Project"> | string
   name?: Prisma.StringFilter<"Project"> | string
+  description?: Prisma.StringNullableFilter<"Project"> | string | null
   ownerId?: Prisma.StringFilter<"Project"> | string
+  defaultFloorPlanFileId?: Prisma.StringNullableFilter<"Project"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
 }
@@ -441,15 +530,19 @@ export type ProjectScalarWhereInput = {
 export type ProjectCreateWithoutRoomsInput = {
   id?: string
   name: string
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  defaultFloorPlanFile?: Prisma.FileCreateNestedOneWithoutProjectDefaultFloorPlanInput
 }
 
 export type ProjectUncheckedCreateWithoutRoomsInput = {
   id?: string
   name: string
+  description?: string | null
   ownerId: string
+  defaultFloorPlanFileId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -473,22 +566,84 @@ export type ProjectUpdateToOneWithWhereWithoutRoomsInput = {
 export type ProjectUpdateWithoutRoomsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  defaultFloorPlanFile?: Prisma.FileUpdateOneWithoutProjectDefaultFloorPlanNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutRoomsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultFloorPlanFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectCreateWithoutDefaultFloorPlanFileInput = {
+  id?: string
+  name: string
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectUncheckedCreateWithoutDefaultFloorPlanFileInput = {
+  id?: string
+  name: string
+  description?: string | null
+  ownerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectCreateOrConnectWithoutDefaultFloorPlanFileInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutDefaultFloorPlanFileInput, Prisma.ProjectUncheckedCreateWithoutDefaultFloorPlanFileInput>
+}
+
+export type ProjectUpsertWithoutDefaultFloorPlanFileInput = {
+  update: Prisma.XOR<Prisma.ProjectUpdateWithoutDefaultFloorPlanFileInput, Prisma.ProjectUncheckedUpdateWithoutDefaultFloorPlanFileInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutDefaultFloorPlanFileInput, Prisma.ProjectUncheckedCreateWithoutDefaultFloorPlanFileInput>
+  where?: Prisma.ProjectWhereInput
+}
+
+export type ProjectUpdateToOneWithWhereWithoutDefaultFloorPlanFileInput = {
+  where?: Prisma.ProjectWhereInput
+  data: Prisma.XOR<Prisma.ProjectUpdateWithoutDefaultFloorPlanFileInput, Prisma.ProjectUncheckedUpdateWithoutDefaultFloorPlanFileInput>
+}
+
+export type ProjectUpdateWithoutDefaultFloorPlanFileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectUncheckedUpdateWithoutDefaultFloorPlanFileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateManyOwnerInput = {
   id?: string
   name: string
+  description?: string | null
+  defaultFloorPlanFileId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -496,14 +651,18 @@ export type ProjectCreateManyOwnerInput = {
 export type ProjectUpdateWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  defaultFloorPlanFile?: Prisma.FileUpdateOneWithoutProjectDefaultFloorPlanNestedInput
   rooms?: Prisma.RoomUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultFloorPlanFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rooms?: Prisma.RoomUncheckedUpdateManyWithoutProjectNestedInput
@@ -512,6 +671,8 @@ export type ProjectUncheckedUpdateWithoutOwnerInput = {
 export type ProjectUncheckedUpdateManyWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultFloorPlanFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -550,10 +711,13 @@ export type ProjectCountOutputTypeCountRoomsArgs<ExtArgs extends runtime.Types.E
 export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  description?: boolean
   ownerId?: boolean
+  defaultFloorPlanFileId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  defaultFloorPlanFile?: boolean | Prisma.Project$defaultFloorPlanFileArgs<ExtArgs>
   rooms?: boolean | Prisma.Project$roomsArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
@@ -561,52 +725,66 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  description?: boolean
   ownerId?: boolean
+  defaultFloorPlanFileId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  defaultFloorPlanFile?: boolean | Prisma.Project$defaultFloorPlanFileArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
 
 export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  description?: boolean
   ownerId?: boolean
+  defaultFloorPlanFileId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  defaultFloorPlanFile?: boolean | Prisma.Project$defaultFloorPlanFileArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
 
 export type ProjectSelectScalar = {
   id?: boolean
   name?: boolean
+  description?: boolean
   ownerId?: boolean
+  defaultFloorPlanFileId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "ownerId" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "ownerId" | "defaultFloorPlanFileId" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  defaultFloorPlanFile?: boolean | Prisma.Project$defaultFloorPlanFileArgs<ExtArgs>
   rooms?: boolean | Prisma.Project$roomsArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProjectIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  defaultFloorPlanFile?: boolean | Prisma.Project$defaultFloorPlanFileArgs<ExtArgs>
 }
 export type ProjectIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  defaultFloorPlanFile?: boolean | Prisma.Project$defaultFloorPlanFileArgs<ExtArgs>
 }
 
 export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Project"
   objects: {
     owner: Prisma.$UserPayload<ExtArgs>
+    defaultFloorPlanFile: Prisma.$FilePayload<ExtArgs> | null
     rooms: Prisma.$RoomPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    description: string | null
     ownerId: string
+    defaultFloorPlanFileId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["project"]>
@@ -1004,6 +1182,7 @@ readonly fields: ProjectFieldRefs;
 export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   owner<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  defaultFloorPlanFile<T extends Prisma.Project$defaultFloorPlanFileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$defaultFloorPlanFileArgs<ExtArgs>>): Prisma.Prisma__FileClient<runtime.Types.Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   rooms<T extends Prisma.Project$roomsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$roomsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RoomPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1036,7 +1215,9 @@ export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.
 export interface ProjectFieldRefs {
   readonly id: Prisma.FieldRef<"Project", 'String'>
   readonly name: Prisma.FieldRef<"Project", 'String'>
+  readonly description: Prisma.FieldRef<"Project", 'String'>
   readonly ownerId: Prisma.FieldRef<"Project", 'String'>
+  readonly defaultFloorPlanFileId: Prisma.FieldRef<"Project", 'String'>
   readonly createdAt: Prisma.FieldRef<"Project", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Project", 'DateTime'>
 }
@@ -1432,6 +1613,25 @@ export type ProjectDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Projects to delete.
    */
   limit?: number
+}
+
+/**
+ * Project.defaultFloorPlanFile
+ */
+export type Project$defaultFloorPlanFileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the File
+   */
+  select?: Prisma.FileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the File
+   */
+  omit?: Prisma.FileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FileInclude<ExtArgs> | null
+  where?: Prisma.FileWhereInput
 }
 
 /**

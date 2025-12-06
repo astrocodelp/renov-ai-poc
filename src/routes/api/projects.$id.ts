@@ -1,8 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { prisma } from "@/db";
-import { auth } from "@/lib/auth";
-
 const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10MB
 
 const isImageFile = (file: File | undefined | null) => {
@@ -58,6 +55,8 @@ export const Route = createFileRoute("/api/projects/$id")({
 	server: {
 		handlers: {
 			GET: async ({ request, params }) => {
+				const { auth } = await import("@/lib/auth.server");
+				const { prisma } = await import("@/db.server");
 				const session = await auth.api.getSession({ headers: request.headers });
 				if (!session) {
 					return json(401, { error: "Unauthorized" });
@@ -156,6 +155,8 @@ export const Route = createFileRoute("/api/projects/$id")({
 				});
 			},
 			PUT: async ({ request, params }) => {
+				const { auth } = await import("@/lib/auth.server");
+				const { prisma } = await import("@/db.server");
 				const session = await auth.api.getSession({ headers: request.headers });
 				if (!session) {
 					return json(401, { error: "Unauthorized" });
@@ -428,6 +429,8 @@ export const Route = createFileRoute("/api/projects/$id")({
 				return json(200, { projectId: params.id });
 			},
 			DELETE: async ({ request, params }) => {
+				const { auth } = await import("@/lib/auth.server");
+				const { prisma } = await import("@/db.server");
 				const session = await auth.api.getSession({ headers: request.headers });
 				if (!session) {
 					return json(401, { error: "Unauthorized" });

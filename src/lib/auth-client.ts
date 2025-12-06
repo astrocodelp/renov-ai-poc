@@ -1,15 +1,11 @@
 import { createAuthClient } from "better-auth/react";
-import { env } from "@/env";
 
 // Better Auth client requires an absolute baseURL. Build it from window origin on the client,
 // and fall back to localhost for SSR/shell evaluation paths.
 const baseURL =
 	typeof window !== "undefined"
 		? new URL("/api/auth", window.location.origin).toString()
-		: new URL(
-				"/api/auth",
-				env.BETTER_AUTH_URL ?? "http://localhost:8749",
-			).toString();
+		: "http://localhost:8749/api/auth";
 
 export const authClient = createAuthClient({
 	baseURL,

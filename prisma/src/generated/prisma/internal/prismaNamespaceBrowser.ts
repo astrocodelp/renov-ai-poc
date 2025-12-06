@@ -56,7 +56,8 @@ export const ModelName = {
   Account: 'Account',
   Verification: 'Verification',
   Project: 'Project',
-  Room: 'Room'
+  Room: 'Room',
+  File: 'File'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -136,7 +137,9 @@ export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[k
 export const ProjectScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  description: 'description',
   ownerId: 'ownerId',
+  defaultFloorPlanFileId: 'defaultFloorPlanFileId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -148,15 +151,30 @@ export const RoomScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
   name: 'name',
+  description: 'description',
   type: 'type',
-  floorPlan: 'floorPlan',
-  image: 'image',
+  floorPlanFileId: 'floorPlanFileId',
+  imageFileId: 'imageFileId',
+  generatedImageFileId: 'generatedImageFileId',
+  generatedVideoFileId: 'generatedVideoFileId',
   geometry: 'geometry',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type RoomScalarFieldEnum = (typeof RoomScalarFieldEnum)[keyof typeof RoomScalarFieldEnum]
+
+
+export const FileScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  mimeType: 'mimeType',
+  bytes: 'bytes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FileScalarFieldEnum = (typeof FileScalarFieldEnum)[keyof typeof FileScalarFieldEnum]
 
 
 export const SortOrder = {

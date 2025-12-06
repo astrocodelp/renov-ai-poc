@@ -8,7 +8,6 @@ import {
 	redirect,
 } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { auth } from "@/lib/auth";
 import {
 	ChevronDown,
 	ChevronRight,
@@ -102,7 +101,7 @@ function DashboardLayout() {
 						<div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 p-1">
 							<img
 								src="/logo_192.png"
-								alt="Rinnov.ai logo"
+								alt="Rennov.ai logo"
 								className="w-9 h-9 object-contain"
 							/>
 						</div>
@@ -113,7 +112,7 @@ function DashboardLayout() {
 							sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none",
 						)}
 					>
-						<p className="text-sm text-muted-foreground">Rinnov.ai</p>
+						<p className="text-sm text-muted-foreground">Rennov.ai</p>
 						<p className="text-lg font-semibold text-foreground">Workspace</p>
 					</div>
 				</div>
@@ -298,6 +297,8 @@ const getProjects = createServerFn({ method: "GET" }).handler(
 	}: {
 		request: Request;
 	}): Promise<{ projects: Project[] }> => {
+		const { auth } = await import("@/lib/auth.server");
+
 		const session = await auth.api.getSession({
 			headers: request.headers,
 		});
@@ -305,7 +306,7 @@ const getProjects = createServerFn({ method: "GET" }).handler(
 			throw redirect({ to: "/login", replace: true });
 		}
 
-		const { prisma } = await import("@/db");
+		const { prisma } = await import("@/db.server");
 
 		const projectsRaw = await prisma.project.findMany({
 			where: { ownerId: session.user.id },
