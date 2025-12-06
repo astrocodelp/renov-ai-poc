@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
@@ -16,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DemoPrismaRouteImport } from './routes/demo/prisma'
 import { Route as DemoMcpTodosRouteImport } from './routes/demo/mcp-todos'
+import { Route as ApiProjectsRouteImport } from './routes/api/projects'
 import { Route as DashboardSettingsIndexRouteImport } from './routes/dashboard/settings/index'
 import { Route as DashboardProjectsIndexRouteImport } from './routes/dashboard/projects/index'
 import { Route as DashboardHomeIndexRouteImport } from './routes/dashboard/home/index'
@@ -26,12 +28,18 @@ import { Route as DemoApiMcpTodosRouteImport } from './routes/demo/api.mcp-todos
 import { Route as DashboardSettingsBasicRouteImport } from './routes/dashboard/settings/basic'
 import { Route as DashboardSettingsAuthRouteImport } from './routes/dashboard/settings/auth'
 import { Route as DashboardProjectsNewRouteImport } from './routes/dashboard/projects/new'
+import { Route as ApiSettingsAccountRouteImport } from './routes/api/settings/account'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
@@ -65,6 +73,11 @@ const DemoPrismaRoute = DemoPrismaRouteImport.update({
 const DemoMcpTodosRoute = DemoMcpTodosRouteImport.update({
   id: '/demo/mcp-todos',
   path: '/demo/mcp-todos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProjectsRoute = ApiProjectsRouteImport.update({
+  id: '/api/projects',
+  path: '/api/projects',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardSettingsIndexRoute = DashboardSettingsIndexRouteImport.update({
@@ -117,6 +130,11 @@ const DashboardProjectsNewRoute = DashboardProjectsNewRouteImport.update({
   path: '/projects/new',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const ApiSettingsAccountRoute = ApiSettingsAccountRouteImport.update({
+  id: '/api/settings/account',
+  path: '/api/settings/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -148,10 +166,13 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/signup': typeof SignupRoute
+  '/api/projects': typeof ApiProjectsRoute
   '/demo/mcp-todos': typeof DemoMcpTodosRoute
   '/demo/prisma': typeof DemoPrismaRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/settings/account': typeof ApiSettingsAccountRoute
   '/dashboard/projects/new': typeof DashboardProjectsNewRoute
   '/dashboard/settings/auth': typeof DashboardSettingsAuthRoute
   '/dashboard/settings/basic': typeof DashboardSettingsBasicRoute
@@ -171,10 +192,13 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/signup': typeof SignupRoute
+  '/api/projects': typeof ApiProjectsRoute
   '/demo/mcp-todos': typeof DemoMcpTodosRoute
   '/demo/prisma': typeof DemoPrismaRoute
   '/dashboard': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/settings/account': typeof ApiSettingsAccountRoute
   '/dashboard/projects/new': typeof DashboardProjectsNewRoute
   '/dashboard/settings/auth': typeof DashboardSettingsAuthRoute
   '/dashboard/settings/basic': typeof DashboardSettingsBasicRoute
@@ -196,10 +220,13 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/signup': typeof SignupRoute
+  '/api/projects': typeof ApiProjectsRoute
   '/demo/mcp-todos': typeof DemoMcpTodosRoute
   '/demo/prisma': typeof DemoPrismaRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/settings/account': typeof ApiSettingsAccountRoute
   '/dashboard/projects/new': typeof DashboardProjectsNewRoute
   '/dashboard/settings/auth': typeof DashboardSettingsAuthRoute
   '/dashboard/settings/basic': typeof DashboardSettingsBasicRoute
@@ -222,10 +249,13 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/mcp'
+    | '/signup'
+    | '/api/projects'
     | '/demo/mcp-todos'
     | '/demo/prisma'
     | '/dashboard/'
     | '/api/auth/$'
+    | '/api/settings/account'
     | '/dashboard/projects/new'
     | '/dashboard/settings/auth'
     | '/dashboard/settings/basic'
@@ -245,10 +275,13 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/mcp'
+    | '/signup'
+    | '/api/projects'
     | '/demo/mcp-todos'
     | '/demo/prisma'
     | '/dashboard'
     | '/api/auth/$'
+    | '/api/settings/account'
     | '/dashboard/projects/new'
     | '/dashboard/settings/auth'
     | '/dashboard/settings/basic'
@@ -269,10 +302,13 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/mcp'
+    | '/signup'
+    | '/api/projects'
     | '/demo/mcp-todos'
     | '/demo/prisma'
     | '/dashboard/'
     | '/api/auth/$'
+    | '/api/settings/account'
     | '/dashboard/projects/new'
     | '/dashboard/settings/auth'
     | '/dashboard/settings/basic'
@@ -294,9 +330,12 @@ export interface RootRouteChildren {
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
+  SignupRoute: typeof SignupRoute
+  ApiProjectsRoute: typeof ApiProjectsRoute
   DemoMcpTodosRoute: typeof DemoMcpTodosRoute
   DemoPrismaRoute: typeof DemoPrismaRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiSettingsAccountRoute: typeof ApiSettingsAccountRoute
   DemoApiMcpTodosRoute: typeof DemoApiMcpTodosRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
@@ -309,6 +348,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mcp': {
       id: '/mcp'
       path: '/mcp'
@@ -356,6 +402,13 @@ declare module '@tanstack/react-router' {
       path: '/demo/mcp-todos'
       fullPath: '/demo/mcp-todos'
       preLoaderRoute: typeof DemoMcpTodosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/projects': {
+      id: '/api/projects'
+      path: '/api/projects'
+      fullPath: '/api/projects'
+      preLoaderRoute: typeof ApiProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/settings/': {
@@ -428,6 +481,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsNewRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/api/settings/account': {
+      id: '/api/settings/account'
+      path: '/api/settings/account'
+      fullPath: '/api/settings/account'
+      preLoaderRoute: typeof ApiSettingsAccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -495,9 +555,12 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   McpRoute: McpRoute,
+  SignupRoute: SignupRoute,
+  ApiProjectsRoute: ApiProjectsRoute,
   DemoMcpTodosRoute: DemoMcpTodosRoute,
   DemoPrismaRoute: DemoPrismaRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiSettingsAccountRoute: ApiSettingsAccountRoute,
   DemoApiMcpTodosRoute: DemoApiMcpTodosRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,

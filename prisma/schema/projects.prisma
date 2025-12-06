@@ -1,0 +1,38 @@
+enum RoomType {
+  LIVING_ROOM
+  KITCHEN
+  BATHROOM
+  BEDROOM
+  DINING_ROOM
+  OFFICE
+  OTHER
+}
+
+model Project {
+  id        String   @id @default(uuid())
+  name      String
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  rooms     Room[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@map("project")
+}
+
+model Room {
+  id        String    @id @default(uuid())
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name      String
+  type      RoomType
+  floorPlan Bytes
+  image     Bytes
+  geometry  Json?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([projectId])
+  @@map("room")
+}

@@ -1,5 +1,5 @@
 {
-  "name": "renovai-poc",
+  "name": "Rinnov.ai-poc",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,7 +15,6 @@
     "db:push": "dotenv -e .env.local -- prisma db push",
     "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
     "db:studio": "dotenv -e .env.local -- prisma studio",
-    "db:seed": "dotenv -e .env.local -- prisma db seed",
     "postinstall": "pnpm db:generate"
   },
   "dependencies": {
@@ -23,8 +22,9 @@
     "@nanostores/react": "^1.0.0",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.1.0",
-    "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-slot": "^1.2.4",
     "@react-three/fiber": "^9.4.2",
     "@t3-oss/env-core": "^0.13.8",
     "@tabler/icons-react": "^3.35.0",
@@ -40,11 +40,14 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.25",
+    "js-cookie": "^3.0.5",
     "lucide-react": "^0.556.0",
+    "motion": "^12.23.25",
     "nitro": "latest",
     "prisma": "^7.1.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
+    "react-dropzone": "^14.3.8",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.6",
     "three": "^0.181.2",

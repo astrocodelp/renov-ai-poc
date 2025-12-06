@@ -54,6 +54,7 @@ code {
   --border: oklch(0.88 0.02 60);
   --input: oklch(0.88 0.02 60);
   --ring: oklch(0.55 0.15 35);
+  --input-hover-accent: var(--primary);
 
   /* Chart colors - interior design palette */
   --chart-1: oklch(0.55 0.15 35);
@@ -107,6 +108,7 @@ code {
   --border: oklch(0.28 0.02 60);
   --input: oklch(0.28 0.02 60);
   --ring: oklch(0.55 0.12 35);
+  --input-hover-accent: var(--primary);
 
   /* Dark charts */
   --chart-1: oklch(0.6 0.18 35);
@@ -146,6 +148,7 @@ code {
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-input-hover-accent: var(--input-hover-accent);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
