@@ -53,3 +53,4 @@ Thumbs.db
 Thumbs.db
 /.history
 /src/generated
+.env.local
